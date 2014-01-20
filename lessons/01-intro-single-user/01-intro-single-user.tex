@@ -1,0 +1,122 @@
+% !Mode:: "TeX:UTF-8"
+\documentclass{tufte-handout}
+
+\title{Git hands-on, part I: single user operations}
+
+\author{S\'ebastien Dawans}
+
+\date{21 January 2014} % without \date command, current date is supplied
+
+%\geometry{showframe} % display margins for debugging page layout
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx} % allow embedded images
+  \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+  \graphicspath{{graphics/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{lipsum}   % filler text
+\usepackage{fancyvrb} % extended verbatim environments
+  \fvset{fontsize=\normalsize}% default font size for fancy-verbatim environments
+\usepackage{listings}
+\lstset{showstringspaces=false}
+\usepackage{xcolor}
+
+\lstdefinestyle{BashInputStyle}{
+  language=bash,
+  basicstyle=\footnotesize\ttfamily,
+  %numbers=left,
+  %numberstyle=\tiny,
+  %numbersep=3pt,
+  frame=tb,
+  columns=fullflexible,
+  backgroundcolor=\color{yellow!20},
+  linewidth=0.95\linewidth,
+  xleftmargin=0.05\linewidth
+}
+
+% Standardize command font styles and environments
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+
+\begin{document}
+
+\maketitle% this prints the handout title, author, and date
+
+\begin{abstract}
+\noindent
+This handout is a walkthrough for a 2-hour hands-on session on the Git.
+The goal is to offer a first experience with Git on the client side using Git's native command-line interface to learn basic concepts about Source Code Management with Git.
+The intended audience for this session is one or more developers having already received in introduction to basic Git concepts, such as those available in the presentations folder of the git-slides repository \url{https://github.com/sdawans/git-slides}.
+This session deals exclusively with single-user repositories, ideal for training multiple people at the same time without having to deal with multi-developer workflows at the very beginning.
+\end{abstract}
+
+%\printclassoptions
+
+\section{Introduction}\label{sec:intro}
+
+Git is a Source Code Management (SCM) system with three key design principles.
+Git is \textbf{Distributed}, \textbf{Fast} and \textbf{Reliable}.
+It is very different from not only centralized SCMs like SVN, but also other forms of distributed SCMs like Mercurial.
+To follow this introductory session, it's best to clear your mind of everything you know about other SCMs, as some false similarities are often misleading.
+
+\section{Preparation}
+
+In preparation of this tutorial, each participant must have a properly installed and configured command-line client for Git, and access to the git repositories used in the next sections.
+
+\subsection{Installing a git client}\label{sec:preparation}
+
+Linux and MacOS X users will find the native git client in their respective package managers.
+Windows user should install the latest versions of TortoiseGit \marginnote{\url{http://code.google.com/p/tortoisegit/}} (for the TortoisePlink.exe binary) and msysgit \marginnote{\url{http://code.google.com/p/msysgit/}}, in that order.
+In the msysgit installation wizard, the path to TortoisePlink.exe should be selected when prompted for the SSH connexion handler.
+Furthermore, windows users will need puttygen.exe and pageant.exe, available on the Putty website \marginnote{\url{http://www.putty.org/}}.
+
+An SSH keypair must be generated puttygen.
+The contents of the public key should be copy/pasted in your Gitlab user settings while the private key should be stored locally and added to pageant.
+You may write a batch script to automatically run pageant at system boot and load the private key.
+
+\subsection{Configuring Git}
+
+People are an important aspect in any SCM, as every code change must be attributed to a certain author.
+\marginnote{In fact, Git manages users thouroughly by seperating \textbf{authors} from \textbf{committers}.
+An author is the person who (originally) writes a certain patch (new code, code modification), while the committer is the person who applies the said changes on a particular code base.}
+The user must thus identify himself before using a git client.
+Git uses a global \texttt{user.name} and \texttt{user.email} setting applied to all projects, which is overridable locally for a specific project.
+For this session, we will set the global settings for all the projects on the machine:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git config --global user.name "First Last"
+  $ git config --global user.email "first.last@example.com"
+\end{lstlisting}
+
+Another useful configuration (already default on msysgit) is to enable color output in the console.
+
+\noindent To do so:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git config --global color.ui true
+\end{lstlisting}
+
+A final useful configuration before getting started is \textbf{shell prompt customization}.
+Windows users using msysgit already have a very basic form of preconfigured customization.
+For Unix-based systems, I recommend the highly configurable git-prompt project. \marginnote{Git Prompt: \url{http://volnitsky.com/project/git-prompt/}}
+
+%TODO: make my notes on git-prompt public and add a link to it
+
+\subsection{Accessing GitLab}
+
+For these sessions, our shared Git repositories will be hosted on a local instance of GitLab, a popular open-source Git hosting solution. \marginnote{My feedback on GitLab [FR] \url{https://www.cetic.be/Solution-Open-Source-et-complete-d}}
+
+\bibliography{tufte-latex/sample-handout}
+\bibliographystyle{plainnat}
+
+
+
+\end{document}
