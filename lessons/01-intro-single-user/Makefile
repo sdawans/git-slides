@@ -11,7 +11,7 @@ PAPER=letter
 	pdflatex ${basename $@}
 
 %.bbl: %.tex
-	git submodule update --init
+	cd ../../; git submodule update --init
 	pdflatex ${basename $@}
 	bibtex ${basename $@}
 
