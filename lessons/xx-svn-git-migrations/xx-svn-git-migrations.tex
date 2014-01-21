@@ -1,0 +1,68 @@
+% !Mode:: "TeX:UTF-8"
+\documentclass{../common/tufte-handout}
+
+\title{Migrating SVN projects to Git with git-svn}
+
+\author{S\'ebastien Dawans}
+
+\date{07 February 2014} % without \date command, current date is supplied
+
+%\geometry{showframe} % display margins for debugging page layout
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx} % allow embedded images
+  \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+  \graphicspath{{graphics/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{lipsum}   % filler text
+\usepackage{fancyvrb} % extended verbatim environments
+  \fvset{fontsize=\normalsize}% default font size for fancy-verbatim environments
+\usepackage{listings}
+\lstset{showstringspaces=false}
+\usepackage[usenames]{xcolor}
+
+\lstdefinestyle{BashInputStyle}{
+  language=bash,
+  basicstyle=\footnotesize\ttfamily,
+  %numbers=left,
+  %numberstyle=\tiny,
+  %numbersep=3pt,
+  frame=tb,
+  columns=fullflexible,
+  backgroundcolor=\color{yellow!20},
+  linewidth=0.95\linewidth,
+  xleftmargin=0.05\linewidth,
+  moredelim=**[is][\color{red}]{§}{§},
+  moredelim=**[is][\color{OliveGreen}]{`}{`}
+}
+
+% Standardize command font styles and environments
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+
+\begin{document}
+
+\maketitle% this prints the handout title, author, and date
+
+\begin{abstract}
+\noindent
+This handout is part of a series of practical courses on Git.
+\marginnote{git-svn is distributed with the standard Unix Git client \url{https://www.kernel.org/pub/software/scm/git/docs/git-svn.html}}
+A common issue when getting started with Git is forgetting old habits adopted while using SVN.
+A great remedy for this is to stop using SVN altogether; that sometimes means having to migrate existing, long-term projects from SVN to Git.
+Here, we will see how easy it is to migrate SVN projects to Git with the \texttt{git-svn} tool.
+A migration can take as few as 10 minutes, so let's get started!
+\end{abstract}
+
+\bibliography{../common/refs}
+\bibliographystyle{plainnat}
+
+\end{document}
