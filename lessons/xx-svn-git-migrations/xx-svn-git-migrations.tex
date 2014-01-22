@@ -22,6 +22,8 @@
 \usepackage{listings}
 \lstset{showstringspaces=false}
 \usepackage[usenames]{xcolor}
+\usepackage{soul}
+\usepackage{enumerate}
 
 \lstdefinestyle{BashInputStyle}{
   language=bash,
@@ -35,7 +37,7 @@
   linewidth=0.95\linewidth,
   xleftmargin=0.05\linewidth,
   moredelim=**[is][\color{red}]{§}{§},
-  moredelim=**[is][\color{OliveGreen}]{`}{`}
+  moredelim=**[is][\color{OliveGreen}]{°}{°}
 }
 
 % Standardize command font styles and environments
@@ -61,6 +63,75 @@ A great remedy for this is to stop using SVN altogether; that sometimes means ha
 Here, we will see how easy it is to migrate SVN projects to Git with the \texttt{git-svn} tool.
 A migration can take as few as 10 minutes, so let's get started!
 \end{abstract}
+
+\section{What this handout is not}
+
+This is \textit{not} a complete reference on how the git-svn tool works.
+There is already plenty of documentation on that, a great one being the Pro Git book by Scott Chacon, available online \cite{git-scm-ch8}.
+git-svn is a Git client offering features of Git where branching, merging, staging, committing, viewing and rewriting the history can all be done locally.
+\marginnote{Rewriting non-pushed, or non "SVN-comitted" history, to be exact.}
+Git fanatics stuck on pre-historic SVN-based projects may certainly find this useful.
+
+This handout only scratches the surface of git-svn as an SVN proxy.
+Instead, we will focus on leveraging this tool to migrate SVN projects to Git once and for all.
+
+\section{Preparation}
+
+\subsection{Installation}
+
+For this tutorial, we will use a sample SVN project hosted on good ol' SourceForge. 
+\marginnote{SourceForge definition of SVN: Enterprise-class centralized version control for the masses. Classy.}
+That means you'll need both a Git client and an SVN client.
+The Git installation is already covered in a previous handout.
+
+To install SVN, Linux users should install the \textbf{subversion} package with
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ apt-get install subversion
+\end{lstlisting}
+
+Windows users may download and execute the TortoiseSVN installer and verify that the svn command is properly added to the \texttt{PATH} variable.
+\marginnote{TortoiseSVN \url{http://tortoisesvn.net/downloads.html}}
+
+\subsection{\st{Clone} Checkout the SVN project}
+
+Last but not least, let's execute our one and only SVN command to grab the SVN project from SourceForge.
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ svn checkout svn://svn.code.sf.net/p/svngitmigration/code/ svngit-project
+  $ cd svngit-project
+\end{lstlisting}
+
+\section{Analyzing the SVN project}
+
+A typical SVN project contains a trunk with the latest development version of the application.
+The trunk is an actual physical folder in the working tree, usually named \textbf{trunk}.
+As opposed to Git, branches and tags have a physical location in the working tree as well, so a common practice is to store these in top-level \textbf{branches} and \textbf{tags} folders, next to the trunk.
+Our sample project follows this convention:
+
+%TODO: Update Tree listing once the SVN project is finished
+\begin{lstlisting}[style=BashInputStyle]
+  $ tree -L 2
+  |-- branches
+  |-- tags
+  |-- trunk
+      |-- README.txt
+\end{lstlisting}
+
+Let's check the log:
+
+%TODO: complete the log when project is done
+\begin{lstlisting}[style=BashInputStyle]
+  $ svn log
+\end{lstlisting}
+
+Before we go on, let's consider some differences between SVN and Git and what this implies in terms of migrating to Git:
+
+\begin{itemize}
+ \item \textbf{SVN branches and tags have a physical location}. This is a major difference to Git, where branches and tags are very lightweight: mere labels and pointers to commits. Thus, there isn't a 1-to-1 match between an SVN working tree and a Git working tree.
+ \item \textbf{Author names are not formatted in the same way}. SVN doesn't require any structure for author names, it's usually the committer's account username on the Subversion system. On the other hand, Git formats the author information with \texttt{"First Last <email@domain.com>"}. We need to provide a mapping for this.
+ \item \textbf{SVN accepts blank commits, Git doesn't}. True, but don't panic. Git will allow the undisciplined SVN user to import his blank commits.
+\end{itemize}
 
 \bibliography{../common/refs}
 \bibliographystyle{plainnat}
