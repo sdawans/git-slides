@@ -1,3 +1,3 @@
-[submodule "lessons/01-intro-single-user/tufte-latex"]
-	path = lessons/01-intro-single-user/tufte-latex
-	url = git@github.com:sdawans/tufte-latex.git
+[submodule "lessons/common/tufte-latex"]
+	path = lessons/common/tufte-latex
+	url = https://github.com/sdawans/tufte-latex.git
