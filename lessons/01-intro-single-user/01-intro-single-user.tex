@@ -81,8 +81,8 @@ In the msysgit installation wizard, the path to TortoisePlink.exe should be sele
 Furthermore, windows users will need puttygen.exe and pageant.exe, available on the Putty website \marginnote{\url{http://www.putty.org/}}.
 
 An SSH keypair must be generated with puttygen.
-The contents of the public key should be copy/pasted in your Gitlab user settings while the private key should be stored locally and added to pageant. \marginnote{When pasting the key in Gitlab, pay particular attention to removing endlines manually in the form. Some browsers will insert endlines even if you remove them from the text editor from which you copy the key.}
-You may write a batch script to automatically run pageant at system boot and load the private key.
+The contents of the public key should be copy/pasted in your Gitlab user settings while the private key should be stored locally and added to pageant. \marginnote{When pasting the public key in Gitlab, make sure you copy it directly from the puttygen application, and not from the public key file saved on disk. This avoids problems caused by superfluous endlines.}
+You may want to write a batch script to automatically run pageant at system boot and load the private key.
 
 \subsection{Configuring Git}
 
