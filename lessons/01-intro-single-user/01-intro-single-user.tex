@@ -589,6 +589,14 @@ Finally, unstaging can also be applied on a per-file basis.
 \section{Untracking and Deleting files}
 
 Deleting a file is treated in the same way as other modifications in Git.
+There are two ways to remove a file from version control.
+The \textit{clean and recommended} way consists in invoking the file/folder removal directly with Git.
+Removing content directly from the filesystem is not as clean, but is \textbf{easily recoverable} in Git.
+\marginnote{SVN users: yes, that my sound like magic.}
+We will have a look at both methods in this section.
+
+\subsection{Removing files using Git}
+
 The cleanest way to remove a file from disk as well as from the Git repository is to use \texttt{git rm} on it:
 
 \begin{lstlisting}[style=BashInputStyle]
@@ -598,13 +606,47 @@ The cleanest way to remove a file from disk as well as from the Git repository i
 This performs two things: it deletes the file from disk, and \textbf{stages} the removal of this file.
 The next commit will thus include the deletion of the file.
 
-If you want to untrack a file from Git without deleting it locally, use the \texttt{cached} option:
+If you want to untrack a file from Git \textit{without deleting it} locally, use the \texttt{cached} option:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git rm --cached <file>
 \end{lstlisting}
 
+\marginnote{rm cached comes in very handy to untrack things you forgot to add to your .gitignore file}
 Git will stage the file to be removed in the next commit, but will not touch the file locally.
+
+\subsection{Removing files outside of Git}
+
+So, what happens when you delete some content locally that Git has been versioning?
+Git will detect the missing content, as a \texttt{git status} will tell you:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ rm README.md
+  $ git status
+  On branch master
+  Your branch is up-to-date with 'origin/master'.
+
+  Changes not staged for commit:
+    (use "git add/rm <file>..." to update what will be committed)
+    (use "git checkout -- <file>..." to discard changes in working directory)
+
+      §deleted:    README.md§
+
+  no changes added to commit (use "git add" and/or "git commit -a")
+\end{lstlisting}
+
+\marginnote{as opposed to a git rm README.md, which stages the deletion.}
+The deleted content is equivalent to a modification: it is not staged by default.
+It is possible to execute \textit{git rm} on each deleted file, even though it's not on disk anymore, which will tell git to stage the deletion.
+However, this can be tedious if you've removed lots of files.
+Instead, you can ask git to synchronize the staging area with all modified content with:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git add -u
+\end{lstlisting}
+
+In case of deleted files, \texttt{git add -u} will stage every modification at once.
+The next commit will apply the file removals.
 
 \pagebreak
 
