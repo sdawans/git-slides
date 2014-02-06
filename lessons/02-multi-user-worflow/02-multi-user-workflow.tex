@@ -1,0 +1,121 @@
+% !Mode:: "TeX:UTF-8"
+\documentclass{../common/tufte-latex/tufte-handout}
+
+\title{Git hands-on, part II: multiple user workflows}
+
+\author{S\'ebastien Dawans}
+
+\date{07 February 2014} % without \date command, current date is supplied
+
+%\geometry{showframe} % display margins for debugging page layout
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx} % allow embedded images
+  \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+  \graphicspath{{graphics/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{lipsum}   % filler text
+\usepackage{fancyvrb} % extended verbatim environments
+  \fvset{fontsize=\normalsize}% default font size for fancy-verbatim environments
+\usepackage{listings}
+\lstset{showstringspaces=false}
+\usepackage[usenames]{xcolor}
+
+\lstdefinestyle{BashInputStyle}{
+  language=bash,
+  basicstyle=\footnotesize\ttfamily,
+  %numbers=left,
+  %numberstyle=\tiny,
+  %numbersep=3pt,
+  frame=tb,
+  columns=fullflexible,
+  backgroundcolor=\color{yellow!20},
+  linewidth=0.95\linewidth,
+  xleftmargin=0.05\linewidth,
+  moredelim=**[is][\color{red}]{§}{§},
+  moredelim=**[is][\color{OliveGreen}]{`}{`}
+}
+
+% Standardize command font styles and environments
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+
+\begin{document}
+
+\maketitle% this prints the handout title, author, and date
+
+\begin{abstract}
+\noindent
+This handout is part of a series of practical courses on Git.
+The previous course, \textbf{part I: single user operations}, introduces Git commands in a single-user setting, mainly for practical reasons to avoid users interacting with the same repository without basic knowledge of Git.
+In practice, of course, it's often desireable to centralize contributions from several developers into a common, unique repository.
+Git doesn't impose a specific workflow for this. 
+In this lesson, we will cover the essentials on managing a multi-developer project with Git.
+We first cover basic concepts, then introduce a popular workflow, git-flow, as an applied example.
+We also cover more advanced concepts, like rewriting history.
+\end{abstract}
+
+\section{Preparation}
+
+To prepare for this session, it is a good idea to re-read the previous handout as a refresher.
+This session uses the lesson2 repository as central Git repository, hosted on your local Gitlab server.
+Make sure you are able to access the lesson2 repository in the web interface, and try a clone:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git clone git@gitlab.server.com:git-training/lesson2 [folder]
+\end{lstlisting}
+
+Remember, \texttt{git clone} creates a new folder, lesson2, with a self-contained git repository (.git folder) and the working tree of the latest version of the default branch, master in this case.
+
+\section{Single remote branch workflows}
+
+In the last lesson, we added features to a local \textbf{master} branch, then pushed this branch regularly to a remote master branch.
+Progessing the local master branch was done in different ways.
+
+\subsection{Single, local branch}
+The first workflow we covered was adding commits directly to the master branch.
+This is the most simple workflow.
+\marginnote{Remember to use \textbf{gitk} often, with the --all option, as it's a very convenient way to visualize the relationship between local branches and those of one or more remotes.}
+\begin{lstlisting}[style=BashInputStyle]
+  $ git clone <repo url>
+  $ git branch
+  * `master`
+  $ git add <new/modified stuff>
+  $ git commit -m "Commit Message"
+  $ git push origin master
+\end{lstlisting}
+
+This is very simple, but doesn't address common questions and issues that arise when tracking large projects and/or when dealing with several developers.
+
+\subsection{Local feature branches}
+We then introduced the \textbf{git branch} command, to create local branches, and \textbf{git checkout} to switch the working tree's contents from that of one branch to another.
+As a reminder, this is a typical workflow for working in a feature branch, then merging it into the local master branch before contributing:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git clone <repo url>
+  $ git branch
+  * `master`
+  $ git branch feature-42 
+  $ git checkout feature-42
+  $ git add <new/modified stuff>
+  $ git commit -m "Commit Message"
+  $ git checkout master
+  $ git merge feature-42
+  $ git push origin master
+\end{lstlisting}
+
+\bibliography{../common/refs}
+\bibliographystyle{plainnat}
+
+\end{document}
+
+
+% \marginnote{}
