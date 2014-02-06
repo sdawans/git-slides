@@ -108,9 +108,32 @@ As a reminder, this is a typical workflow for working in a feature branch, then 
   $ git add <new/modified stuff>
   $ git commit -m "Commit Message"
   $ git checkout master
-  $ git merge feature-42
+  $ git merge feature-42 [--no-ff]
   $ git push origin master
 \end{lstlisting}
+
+In this context, the feature branch is used locally to isolate modifications until they are merged in the master branch.
+Like a lot of short-lived feature branches, it was never actually pushed to the remote repository.
+
+If working on a long-term feature, it may be a good practice to push the feature branch to the remote repository for the sake of not losing your work:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git push origin feature-42
+\end{lstlisting}
+
+This doesn't affect the remote master branch in any way, just like our local feature-42 branch has not affected our local master branch until we merged.
+You can always decide to delete it later on:
+\marginnote{The general syntax for pushing a branch is git push remotealias localbranch:remotebranch, i.e. you can change the name when pushing. Thus, the weird :remotebranch syntax pushes nothing into remotebranch --> remotebranch is deleted!}
+\begin{lstlisting}[style=BashInputStyle]
+  $ git push origin :feature-42
+\end{lstlisting}
+
+\subsection{Multiple long-term remote branches}
+Sometimes it's useful to have multiple long-term branches on a remote repository.
+The most common occurrence of this is the use of a \textbf{master} branch to host stable code, and a \textbf{develop} or \textbf{unstable} branch to host the day-to-day work in progress, not necessarily stable or tested.
+A public repository with these two branches typically adresses 2 types of people.
+The \textbf{develop} branch will interest contributing developers, who will want the bleeding-edge development version to rebase their contributions on it.
+The \textbf{master} branch containing only stable code and updated at each release will be useful for the end-users.
 
 \bibliography{../common/refs}
 \bibliographystyle{plainnat}
