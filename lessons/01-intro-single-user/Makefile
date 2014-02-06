@@ -1,4 +1,4 @@
-default: clean 01-intro-single-user.pdf
+default: clean 01-intro-single-user.pdf 01-b-complements.pdf
 FIGURES=
 PAPER=letter
 #PAPER=a4
