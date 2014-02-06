@@ -13,7 +13,7 @@ PAPER=letter
 %.bbl: %.tex
 	cd ../../; git submodule update --init
 	pdflatex ${basename $@}
-	bibtex ${basename $@}
+	-bibtex ${basename $@}
 
 .PHONY: clean
 clean:
