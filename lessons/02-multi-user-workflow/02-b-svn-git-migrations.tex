@@ -248,11 +248,19 @@ Or we can use the annotated tag if we prefer to add a meaningful description:
   $ git tag -a 1.1 remotes/tags/r1.1 -m "Tag 1.1 description"
 \end{lstlisting}
 
+Then, we can safely delete the virtual remote-tracking branches representing the SVN tags:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git branch -r -d tags/r1.0
+  $ git branch -r -d tags/r1.1
+\end{lstlisting}
+
 \subsection{Step 4: Create local copies of the branches}
 
-This creates a local branch called feature1, using the virtual remotes/feature1 branch: 
+This creates a local branch called feature1, using the virtual remotes/feature1 branch, and deletes the remote-tracking branch:
 \begin{lstlisting}[style=BashInputStyle]
   $ git branch feature1 remotes/feature1
+  $ git branch -r -d feature1
 \end{lstlisting}
 
 It should be repeated for each branch when there are several.
