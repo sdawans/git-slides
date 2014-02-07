@@ -1,7 +1,7 @@
 % !Mode:: "TeX:UTF-8"
 \documentclass{../common/tufte-latex/tufte-handout}
 
-\title{Migrating SVN projects to Git with git-svn}
+\title{Git Hands-on, part II-b: Migrating from SVN to Git}
 
 \author{S\'ebastien Dawans}
 
@@ -22,6 +22,8 @@
 \usepackage{listings}
 \lstset{showstringspaces=false}
 \usepackage[usenames]{xcolor}
+\usepackage{soul}
+\usepackage{enumerate}
 
 \lstdefinestyle{BashInputStyle}{
   language=bash,
@@ -35,7 +37,7 @@
   linewidth=0.95\linewidth,
   xleftmargin=0.05\linewidth,
   moredelim=**[is][\color{red}]{§}{§},
-  moredelim=**[is][\color{OliveGreen}]{`}{`}
+  moredelim=**[is][\color{OliveGreen}]{°}{°}
 }
 
 % Standardize command font styles and environments
@@ -61,6 +63,255 @@ A great remedy for this is to stop using SVN altogether; that sometimes means ha
 Here, we will see how easy it is to migrate SVN projects to Git with the \texttt{git-svn} tool.
 A migration can take as few as 10 minutes, so let's get started!
 \end{abstract}
+
+\section{What this handout is not}
+
+This is \textit{not} a complete reference on how the git-svn tool works.
+There is already plenty of documentation on that, a great one being the Pro Git book by Scott Chacon, available online \cite{git-scm-ch8}.
+git-svn is a Git client offering features of Git where branching, merging, staging, committing, viewing and rewriting the history can all be done locally.
+\marginnote{Rewriting non-pushed, or non "SVN-comitted" history, to be exact.}
+Git fanatics stuck on pre-historic SVN-based projects may certainly find this useful.
+
+This handout only scratches the surface of git-svn as an SVN proxy.
+Instead, we will focus on leveraging this tool to migrate SVN projects to Git once and for all.
+
+\section{Preparation}
+
+\subsection{Installation}
+
+For this tutorial, we will use a sample SVN project hosted on good ol' SourceForge. 
+\marginnote{SourceForge definition of SVN: Enterprise-class centralized version control for the masses. Classy.}
+That means you'll need both a Git client and optionally an SVN client.
+\marginnote{We will only use SVN for browsing through the project, but the migration doesn't require it.}
+The Git installation is already covered in a previous handout.
+
+To install SVN, Linux users should install the \textbf{subversion} package.
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ apt-get install subversion
+\end{lstlisting}
+
+Windows users may download and execute the TortoiseSVN installer and verify that the svn command is properly added to the \texttt{PATH} variable.
+\marginnote{TortoiseSVN \url{http://tortoisesvn.net/downloads.html}}
+
+\subsection{\st{Clone} Checkout the SVN project}
+
+Last but not least, let's execute our one and only SVN command to grab the SVN project from SourceForge.
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ svn checkout svn://svn.code.sf.net/p/svngitmigration/code/ svngit-project
+  $ cd svngit-project
+\end{lstlisting}
+
+Having a local checkout of the SVN project is not a required step for the migration, but we're doing this to have a look at the structure of the SVN project before migrating.
+
+\section{Analyzing the SVN project}
+
+A typical SVN project contains a trunk with the latest development version of the application.
+The trunk is an actual physical folder in the working tree, usually named \textbf{trunk}.
+As opposed to Git, branches and tags have a physical location in the working tree as well, so a common practice is to store these in top-level \textbf{branches} and \textbf{tags} folders, next to the trunk.
+Our sample project follows this convention:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ tree -L 2
+  .
+  |-- branches
+  |   |-- feature1
+  |-- tags
+  |   |-- r1.0
+  |   |-- r1.1
+  |-- trunk
+    |-- README.txt
+    |-- src
+
+\end{lstlisting}
+
+Let's check the log:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ svn log
+\end{lstlisting}
+
+Before we go on, let's consider some differences between SVN and Git \footnote{Other than the time it took to display the log of 12 commits} and what this implies in terms of migrating to Git:
+
+\begin{itemize}
+ \item \textbf{SVN branches and tags have a physical location}. This is a major difference to Git, where branches and tags are very lightweight: mere labels and pointers to commits. Thus, there isn't a 1-to-1 match between an SVN working tree and a Git working tree.
+ \item \textbf{Author names are not formatted in the same way}. SVN doesn't require any structure for author names, it's usually the committer's account username on the Subversion system. On the other hand, Git formats the author information with \texttt{"First Last <email@domain.com>"}. We need to provide a mapping for this.
+ \item \textbf{SVN accepts blank commits, Git doesn't}. True, but don't panic. Git will allow the undisciplined SVN user to import his blank commits.
+\end{itemize}
+
+\marginnote{You can also visualize it on SourceForge \url{http://sourceforge.net/p/svngitmigration/code}}
+We can delete this local checkout, we don't need it.
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ cd ..
+  $ rm -rf svngit-project
+\end{lstlisting}
+
+\section{SVN to Git Migration}
+
+\subsection{Step 1: prepare authors mapping}
+We need to create a file which contains the mapping of SVN and Git authors.
+The format of this file is 1 line per author:
+
+\begin{lstlisting}[style=BashInputStyle]
+  SVN name = Git name
+  SVN name = Git name
+  ...
+\end{lstlisting}
+
+If you're lazy and you don't want to figure out who has been working on the project you can use the following bash script to poll the SVN repository and dump a list of author names:
+
+\begin{lstlisting}[style=BashInputStyle]
+authors=$(svn log -q http://svn.code.sf.net/p/svngitmigration/code/ | \ 
+           grep -e '^r' | awk 'BEGIN { FS = "|" } ; { print $2 }' | \
+           sort | uniq)
+           for author in ${authors}; do
+             echo "${author} = ${author%@*} <${author}>";
+           done
+\end{lstlisting}
+
+There is only 1 author in this project, so it will output:
+
+\begin{lstlisting}[style=BashInputStyle]
+  sdawans = sdawans <sdawans>
+\end{lstlisting}
+
+Now simply copy/paste this into a new file, which we will call 'authors', and adjust the Git side:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ touch authors
+  $ echo "sdawans = Sebastien Dawans <sebastien@dawans.be>" >> authors
+\end{lstlisting}
+
+\subsection{Step 2: Git SVN Clone}
+The magic command which does about 80\% of the work is \textbf{git svn clone <url>}.
+We will add a few options to it, however, to make it even smarter.
+The options are:
+
+\noindent \textbf{-- no-metadata:} Drops some superfluous info in commit messages which the tool normally adds for the general use case of the git svn tool as an SVN proxy.
+
+\noindent \textbf{-- authors-file:} Path to our authors mapping file.
+
+\noindent \textbf{-- trunk:} Path to the trunk directory from the project root
+
+\noindent \textbf{-- branches:} Path to the branches directory.
+
+\noindent \textbf{-- tags:} Path to the tags directory.
+
+\noindent Let's put it all together:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git svn clone http://svn.code.sf.net/p/svngitmigration/code/ \
+    --authors-file=authors --no-metadata --trunk=trunk \ 
+    --branches=branches --tags=tags
+\end{lstlisting}
+
+This will create a new Git repository, in a folder named \textbf{code}, which we will analyse now:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ cd code
+  $ tree
+  .
+  |-- README.txt
+  |-- src
+      |-- calc.py
+\end{lstlisting}
+
+The Git and SVN working tree are very different.
+The Git working tree contains a \textbf{master} branch, whos version is the latest version of the \textbf{trunk} directory of the SVN project.
+Branches and Tags are not part of the working tree itself in Git, and the tool has already taken this into account.
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git branch -a
+  * `master`
+    §remotes/feature1§
+    §remotes/tags/r1.0§
+    §remotes/tags/r1.1§
+    §remotes/trunk§
+\end{lstlisting}
+
+We see that Git has stored remote branches for each feature and each tag defined in the SVN repository.
+There is no physical remote behind this, it is only a virtual remote acting as a proxy for the physical branches and tags in the SVN working tree.
+
+\subsection{Step 3: Convert tags to real Git tags}
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git tag 1.0 remotes/tags/r1.0
+  $ git tag 1.1 remotes/tags/r1.1
+\end{lstlisting}
+
+Or we can use the annotated tag if we prefer to add a meaningful description:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git tag -a 1.0 remotes/tags/r1.0 -m "Tag 1.0 description"
+  $ git tag -a 1.1 remotes/tags/r1.1 -m "Tag 1.1 description"
+\end{lstlisting}
+
+\subsection{Step 4: Create local copies of the branches}
+
+This creates a local branch called feature1, using the virtual remotes/feature1 branch: 
+\begin{lstlisting}[style=BashInputStyle]
+  $ git branch feature1 remotes/feature1
+\end{lstlisting}
+
+It should be repeated for each branch when there are several.
+
+\subsection{Step 5: Push to a Git Repo}
+
+The final step is to push to your new Git repository.
+Assuming you have already created a project on a Git server on which you have RW access,
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git remote add origin <url>
+  $ git push origin --all --tags
+\end{lstlisting}
+
+This pushes all branches and all tags.
+
+\section{More automation}
+
+Steps 3 and 4 can be automated in a single command.
+
+To tag all tags at once:
+\begin{lstlisting}[style=BashInputStyle]
+  $ git for-each-ref refs/remotes/tags | cut -d / -f 4- | \
+    grep -v @ | while read tagname; \
+    do git tag "$tagname" "tags/$tagname"; \
+    git branch -r -d "tags/$tagname"; done
+\end{lstlisting}
+
+To create all branches in 1 command:
+\begin{lstlisting}[style=BashInputStyle]
+  $ git for-each-ref refs/remotes | cut -d / -f 3- | \
+    grep -v @ | while read branchname; \
+    do git branch "$branchname" "refs/remotes/$branchname"; \
+    git branch -r -d "$branchname"; done
+\end{lstlisting}
+
+\section{Manual Optimizations}
+
+The automated procedures given above are well suited for well organized projects, or simple ones with only a trunk.
+However, an SVN repo isn't always formatted the way you would have like it to be.
+It is not rare to encounter repositories with large binary files, libraries and generated files which have been version controlled by mistake or lack of discipline.
+An SVN to Git migration is a good opportunity to clean up some of these issues.
+
+The best time to unversion unwanted files is \textbf{during} the migration to git itself to avoid adding large blobs to the git object base.
+The \textbf{git svn clone} command accepts an \textbf{--ignore-path} option formatted using a Perl regex.
+
+This example excludes all folders called bin, doc and lib within the entire SVN project:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git svn --authors-file=authors clone <url> \ 
+    --no-metadata --ignore-paths="^bin|^doc|^lib"
+\end{lstlisting}
+
+Let's remember to add a .gitignore file while we are at it, to keep ignoring these in Git:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ printf "bin\nlib\ndoc\n" > .gitignore
+\end{lstlisting}
+
 
 \bibliography{../common/refs}
 \bibliographystyle{plainnat}
