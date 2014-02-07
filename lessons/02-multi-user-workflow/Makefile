@@ -1,4 +1,4 @@
-default: clean 01-intro-single-user.pdf 01-b-complements.pdf
+default: clean 02-multi-user-workflow.pdf
 FIGURES=
 PAPER=letter
 #PAPER=a4
