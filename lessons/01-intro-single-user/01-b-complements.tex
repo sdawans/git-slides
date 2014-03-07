@@ -388,6 +388,11 @@ Git will stop after picking 511d31d.
 So how to split it up into smaller ones?
 \marginnote{yes, a reset within a rebase operation is allowed}
 The user must now \textbf{reset} on HEAD\textasciitilde1, which undoes the last commit, the one Git has just picked, and sets to modified state all the modifications of the commit.
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git reset HEAD~1
+\end{lstlisting}
+
 \marginnote{remember how useful git add -p is for staging partial information}
 You can now \textbf{git add} the modifications partially, commit, stage more, commit again, etc, until everything has been staged and committed:
 
