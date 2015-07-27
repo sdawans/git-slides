@@ -1,7 +1,7 @@
-default: clean 01-a-intro-single-user.pdf 01-b-complements.pdf
+default: clean 01-intro-and-installation.pdf
 FIGURES=
-PAPER=letter
-#PAPER=a4
+#PAPER=letter
+PAPER=a4
 
 %.pdf: %.fig
 	fig2dev -L pdf $< $@
