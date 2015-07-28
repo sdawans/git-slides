@@ -1,4 +1,4 @@
-default: clean 02-a-multi-user-workflow.pdf 02-b-svn-git-migrations.pdf
+default: clean 04-svn-git-migrations.pdf
 FIGURES=
 PAPER=letter
 #PAPER=a4
