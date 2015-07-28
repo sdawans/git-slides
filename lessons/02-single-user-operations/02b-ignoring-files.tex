@@ -1,0 +1,184 @@
+% !Mode:: "TeX:UTF-8"
+\documentclass{../common/tufte-latex/tufte-handout}
+
+\title{Git hands-on, part II-b: Ignoring Files}
+\author{S\'ebastien Dawans}
+
+%\date{07 February 2014} % without \date command, current date is supplied
+
+%\geometry{showframe} % display margins for debugging page layout
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx} % allow embedded images
+  \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+  \graphicspath{{graphics/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{lipsum}   % filler text
+\usepackage{fancyvrb} % extended verbatim environments
+  \fvset{fontsize=\normalsize}% default font size for fancy-verbatim environments
+\usepackage{listings}
+\lstset{showstringspaces=false}
+\usepackage[usenames]{xcolor}
+\usepackage{hyperref}
+
+\lstdefinestyle{BashInputStyle}{
+  language=bash,
+  basicstyle=\footnotesize\ttfamily,
+  %numbers=left,
+  %numberstyle=\tiny,
+  %numbersep=3pt,
+  frame=tb,
+  columns=fullflexible,
+  backgroundcolor=\color{yellow!20},
+  linewidth=0.95\linewidth,
+  xleftmargin=0.05\linewidth,
+  moredelim=**[is][\color{red}]{§}{§},
+  moredelim=**[is][\color{OliveGreen}]{`}{`}
+}
+
+% Standardize command font styles and environments
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+
+\begin{document}
+
+\maketitle% this prints the handout title, author, and date
+
+\begin{abstract}
+\noindent
+This handout is provided as an Annex to \texttt{Part II: Single User Operations}. It covers how to ignore files in Git and how to recover from situations where you are tracking unwanted files.
+\end{abstract}
+
+\section{Ignoring files}
+\label{section:ignore}
+In many source code directories, there are files which we do not want to (or should not) version control.
+Any file which is generated from source code and likely to change at every compilation of the project should not be version controlled.
+Likewise, huge files should be handled by other means, even if these are not necessarily regenerated and are a required dependency for a project compilation or runtime like a library.
+To handle this, Git can be told to ignore certain files by pattern rules.
+Ignored untracked files will stay untracked without polluting the \textbf{git status} output.
+
+\subsection{Using .gitignore files}
+There are several ways of instructing git to ignore files by pattern rules, the most common one is by means of \textbf{.gitignore} files placed in the working tree and version-controlled in the same way as a normal file.
+\marginnote{Type \textbf{git help gitignore} for a list of other ways to ignore files. Note that there is an order of precedence.}
+
+It is important to define a \textbf{.gitignore} file as early on in a Git project as possible.
+When creating a new project from scratch, it's good practice to include a .gitignore file in the first commit, even if empty.
+When adding an existing code base to Git, it's even more important to get the .gitignore right before adding the whole project recursively, because there might already exist some files which you need to ignore.
+
+\noindent \textbf{Example}.
+Consider a very simple C project with .c files, a Makefile and a generated binary.
+Suppose we have just created a \texttt{hello.c} file, adapted our Makefile and compiled it:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git status
+  On branch master
+  Untracked files:
+    (use "git add <file>..." to include in what will be committed)
+  
+      §Makefile§
+      §hello.c§
+      §hello.exe§
+
+nothing added to commit but untracked files present (use "git add" to track)
+\end{lstlisting}
+
+If we type \texttt{git add .} at this point, all three files will be added to Git.
+Suppose we wanted to ignore the generated file, we could decide to exlude all files ending in ".exe", let's create a file called .gitignore and add \textbf{*.exe} on the first line:
+\begin{lstlisting}[style=BashInputStyle]
+  $ touch .gitignore
+  $ echo "*.exe" >> .gitignore
+\end{lstlisting}
+
+The next time we look at \texttt{git status}, it will be ignored:
+\begin{lstlisting}[style=BashInputStyle]
+  $ git status
+  On branch master
+  Untracked files:
+    (use "git add <file>..." to include in what will be committed)
+  
+      §.gitignore§
+      §Makefile§
+      §hello.c§
+
+nothing added to commit but untracked files present (use "git add" to track)
+\end{lstlisting}
+
+Notice that we have a new untracked file, our new .gitignore file.
+We can now add the whole project and make our first commit.
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git add .
+  $ git commit -m "Initial Commit: adding the project files"
+\end{lstlisting}
+
+In Git the .gitignore files are part of the working tree and must be committed like any other source file.
+This is very convenient because it allows to propagate the rules of ignored files.
+Regular users of a project thus do not usually worry about .gitignores, the work of defining ignored files having already been done by the project owner, who knows best which files should be ignored.
+
+\subsection{Forgot to ignore some files?}
+At some point you might forget to include a certain pattern in a .gitignore.
+If some files have accidentally been added to version control when they should not have, it is easy to ignore them later.
+Assuming that the file is not required to be on the repository, we have already learned the required command in the previous lesson: \texttt{git rm} with the \texttt{cached} option.
+
+Suppose we have a \texttt{hello.exe} binary file part of the repository which we want to untrack and ignore, we would do:
+\marginnote{The \textbf{cached} option preserves a local copy of hello.exe, which isn't really necessary since we know we can just regenerate it with our Makefile}
+\begin{lstlisting}[style=BashInputStyle]
+  $ git rm --cached hello.exe
+  $ echo "*.exe" >> .gitignore
+  $ git add .gitignore
+  $ git commit -m "Remove file hello.exe and ignore all *.exe files"
+\end{lstlisting}
+
+Note that this procedure is \textbf{not sufficient if you are concerned with removing a huge binary file from a git repository} for performance reasons, because it is still contained in the history and the blob in the git objects database is still there.
+Permanently removing the objects from the repository requires all the refs on the blob to be removed, followed by a garbage collection of the unreferences blobs.
+This is not trivial and definately out of scope of our lesson.
+
+\subsection{Ignoring a versioned file without removing it from Git}
+In some projects, it is sometimes necessary to ignore local modifications of a certain file but not remove the file from version control.
+An example of this is when a developer needs to change parts of a file to match a certain local setting, like activating a debugging flag in a file or specifiying credentials like database login/password in a script interacting with a database.
+Ignoring modifications to such files cleans your git status and also avoid you to accidentally commit those changes if you use shortcuts like \texttt{git commit -a}.
+You cannot simply use a local (untracked) .gitignore file for this, because \textbf{.gitignore only applies to untracked files}; you cannot ignore a file already part of the repository.
+\marginnote{A local, uncommitted .gitignore file would not be a clean way even if it was possible, because the .gitignore file itself would appear as untracked every time you type git status.}
+
+Although git stash does the trick, git stash will actually hide your modifications from the working tree so you would need to stash and unstash your local modifications everytime you want to commit.
+
+An simpler alternative is to temporarily ignore local changes in a file:
+\begin{lstlisting}[style=BashInputStyle]
+  $ git update-index --assume-unchanged <file>
+\end{lstlisting}
+
+This activates a certain flag on the file and marks it as ignored by Git.
+The file will still receive updates from upstream, but local modifications will be ignored.
+To undo this:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git update-index --no-assume-unchanged <file>
+\end{lstlisting}
+
+You can obtain a list of all files ignore in this way using:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git ls-files -v | grep ^[a-z]
+\end{lstlisting}
+
+The following 3 aliases are useful to add in your ~/.gitconfig:
+
+\begin{lstlisting}[style=BashInputStyle]
+[alias]
+        ignore = !git update-index --assume-unchanged 
+        unignore = !git update-index --no-assume-unchanged
+        ignored = !git ls-files -v | grep ^[a-z]
+\end{lstlisting}
+
+\bibliography{../common/refs}
+\bibliographystyle{plainnat}
+
+\end{document}
