@@ -68,7 +68,7 @@ Git peut ignorer certains fichiers à l'aide de règles.
 Un fois ignorés les fichiers untracked restent untracked sans encombrer la sortie de \textbf{git status}.
 
 \subsection{Les fichiers .gitignore}
-Il y a plusieurs façon de préciser à git d'ignorer des fichiers par patterns, le plus courant état l'utilisation de fichiers \textbf{.gitignore} dans le working tree et versionnés comme des fichiers source normaux.
+Il y a plusieurs façons de préciser à git d'ignorer des fichiers par patterns, le plus courant état l'utilisation de fichiers \textbf{.gitignore} dans le working tree et versionnés comme des fichiers source normaux.
 \marginnote{L'aide \textbf{git help gitignore} fourni une liste d'autres méthodes pour ignorer des fichiers. Notez qu'il y a une ordre de priorités.}
 
 Il est important de définir un fichier \textbf{.gitignore} le plus tôt possible dans la vie d'un projet Git.
@@ -93,7 +93,7 @@ nothing added to commit but untracked files present (use "git add" to track)
 \end{lstlisting}
 
 Si l'on exécute \texttt{git add .} ici, les trois fichiers seront ajoutés à Git.
-Or, si nous voulons ignorer le fichier généré, il faut le faire avant le git add. Pour cela, nous pouvons décider d'exclure tous les fichiers avec l'extension ".exe" en créant un .gitignore avec \textbf{*.exe} comme première ligne:
+Or, si nous voulons ignorer le fichier généré, il faut le faire avant le git add. Pour cela, nous pouvons exclure tous les fichiers avec l'extension ".exe" en créant un .gitignore avec \textbf{*.exe} comme première ligne:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ touch .gitignore
@@ -130,7 +130,7 @@ Les usagers occasionnels du projet ne doivent donc pas se soucier des .gitignore
 \subsection{Oublié d'ignorer des fichiers?}
 Il se pourrait que vous n'ayez pas ignoré tout ce qui était nécessaire.
 Si vous avez accidentellement versionné des fichiers, il est possible de les ignorer plus tard.
-En supposant que le fichier n'a pas besoin d'être sur le repository, nous pouvons réutiliser la commande vue à la partie II: \texttt{git rm} avec l"option \texttt{cached}.
+En supposant que le fichier n'a pas besoin d'être sur le repository, nous pouvons réutiliser la commande vue à la partie II: \texttt{git rm} avec l'option \texttt{cached}.
 
 Si un fichier \texttt{hello.exe} fait partie de repository et que nous souhaitons l'ignorer, nous devons effectuer la suppression et l'édition du .gitignore simultanément: 
 \marginnote{Pour rappel, l'option \textbf{cached} préserve une copie locale du fichier à supprimer du repo. Ce n'est pas particulièrement utile ici car notre Makefile peut regénérer le binaire à partir de hello.c.}
@@ -141,18 +141,18 @@ Si un fichier \texttt{hello.exe} fait partie de repository et que nous souhaiton
   $ git commit -m "Remove file hello.exe and ignore all *.exe files"
 \end{lstlisting}
 
-Notons que cette procédure n'est pas suffisante si vous souhaitez retirer un gros fichier binaire du repository, pour des raisons de performance, car le fichier sera encore dans l'historique et le \texttt{blob} correspondant sera encore dans les objets gu repo.
-Pour supprimer définitivement un objet du repository requiert que toutes les références vers ce blob soient supprimées de toutes les branches, suivi d'un garbage collection pour supprimers le blobs non-référencés.
+Notons que cette procédure n'est pas suffisante si vous souhaitez retirer un gros fichier binaire du repository, pour des raisons de performance, car le fichier sera encore dans l'historique et le \texttt{blob} correspondant sera encore dans les objets du repo.
+Pour supprimer définitivement un objet du repository requiert que toutes les références vers ce blob soient supprimées de toutes les branches, suivi d'un garbage collection pour supprimer les blobs non-référencés.
 C'est une opération non-trivial et au-délà de cette formation.
 
 \subsection{Ignorer un fichier versionné sans le retirer de Git}
 Moins fréquemment, il vous sera peut-être utile d'ignorer des modifications locales apportées à un fichier qui doit rester sous contrôle de version.
-Par example un développeur pour modifier des parties d'un fichier source pour du debug, tel qu'un flag de debug, ou insérer ses données utilisateur dans un script pour automatiser l'accès à une base de données.
+Par example un développeur pourrait modifier des parties d'un fichier source pour du debug, tel qu'un flag de debug, ou insérer ses données utilisateur dans un script pour automatiser l'accès à une base de données.
 Ignorer les modifications locales dans un tel fichier nettoie la sortie de \texttt{git status} et évite d'indexer ces modifications accidentellement, surtout si vous utilisez des raccourcis comme \texttt{git commit -a}. \marginnote{committer un mot de passe peut-être gênant!}
 Vous ne pouvez pas simplement maintenir un fichier .gitignore (non suivi) pour cela, car \textbf{.gitignore ne s'applique qu'aux fichiers untracked}; vous ne pouvez pas ignorer un fichier faisant déjà partie d'un repo.
 \marginnote{Un .gitignore local non-versionné ne serait d'ailleurs pas une solution propre, même si elle fonctionnait, car il resterait le problème du .gitignore lui-même qui doit être ignoré.}
 
-Une solution relativement plus simple est de temporairement ignorer les changements dans un ficheir local:
+Une solution relativement plus simple est de temporairement ignorer les changements dans un fichier local avec:
 \begin{lstlisting}[style=BashInputStyle]
   $ git update-index --assume-unchanged <file>
 \end{lstlisting}
@@ -165,13 +165,13 @@ Pour retirer ce flag:
   $ git update-index --no-assume-unchanged <file>
 \end{lstlisting}
 
-Il est possible de lister tous les fichiers ignorés de cette manière:
+\noindent Il est possible de lister tous les fichiers ignorés de cette manière:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git ls-files -v | grep ^[a-z]
 \end{lstlisting}
 
-Ces 3 alias sont utiles à inclure dans votre \textasciitilde/.gitconfig:
+\noindent Ces 3 alias sont utiles à inclure dans votre \textasciitilde/.gitconfig:
 
 \begin{lstlisting}[style=BashInputStyle]
 [alias]

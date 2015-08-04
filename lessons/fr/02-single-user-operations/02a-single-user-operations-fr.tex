@@ -119,13 +119,13 @@ Dans \marginnote{Bien que nous ne l'ayons pas vu explicitement, \texttt{master} 
 
 \section{Explorer le Repository}
 
-Nous venons de cloner ou initialiser notre premier repository, and avons vu la difference entre le \textbf{working tree} et le \textbf{repository local}.
-La plupart de commandes Git interagissent avec le repository local afin d'échanger de l'information avec le \texttt{working tree}.
+Nous venons de cloner ou d'initialiser notre premier repository, et nous avons vu la différence entre le \textbf{working tree} et le \textbf{repository local}.
+La plupart des commandes Git interagissent avec le repository local afin d'échanger de l'information avec le \texttt{working tree}.
 Avant d'appliquer un quelconque changement, faisons le tour des commandes de visualisation du projet et de son historique.
 
 \subsection{Lister les Remotes}
 
-La commande \texttt{git clone} initialize un repository local qui réplique un certain repository \texttt{remote}, identifié par une URL.
+La commande \texttt{git clone} initialise un repository local qui réplique un certain repository \texttt{remote}, identifié par une URL.
 L'information relative à l'état des repository \texttt{remote} est stocké dans un coin du dossier \texttt{.git} dans lequel nous nous n'avanturerons pas.
 Pour lister les noms des remotes, utilisons:
 
@@ -152,7 +152,7 @@ Il existe une version plus verbeuse de \texttt{git remote} qui liste en plus les
 \end{lstlisting}
 
 Sans passer en revue la liste exhaustive des commandes liées aux remotes, notons tout de même qu'il est possible d'ajouter et de supprimer des repos distants, ainsi que de définir une nouvelle URL pour un remote existant.
-Par example, nous pouvons utiliser une autre forme d'URL (mais tout à fait équivalent à la première):
+Par exemple, nous pouvons utiliser une autre forme d'URL (mais tout à fait équivalent à la première):
 
 \marginnote{Ceci est une commande d'une ligne affichée en 2 lignes. C'est représenté par un "\textbackslash" et une seconde ligne indentée.}
 
@@ -164,7 +164,7 @@ Par example, nous pouvons utiliser une autre forme d'URL (mais tout à fait équ
 \subsection{Les branches locales et remotes}
 
 Comme nous le verrons à travers cette formation, les \textbf{branches} sont omniprésentes dans Git.
-Dès lors, les commands qui listent les branches et montrent les relations entre branches sont particulièrement utiles.
+Dès lors, les commands qui listent les branches et montrent les relations entre branches sont parti-culièrement utiles.
 Le moyen le plus simple de visualiser une liste de branches est:
 
 \marginnote{Sans l'option \texttt{-a}, la commande \texttt{git branch} n'affichera que les branches locales.}
@@ -211,8 +211,8 @@ Git log a plein d'options utiles, notons quelques unes d'entre elles ci-dessous:
 
 \subsection{Aperçu graphique des branches}
 
-La visualisation des branches en console est rapide mais a des limites, surtout lorsqu'on multiplie le nombre de branches et de remotes.
-Une alternative simple est l'utilisation d'un client graphique pour la visualisation tel que Gitk qui set fourni de base avec msysgit et inclus dans les installation Git de Linux et MacOS X.
+La visualisation des branches en console est rapide mais a des li-mites, surtout lorsqu'on multiplie le nombre de branches et de remotes.
+Une alternative simple est l'utilisation d'un client graphique pour la visualisation tel que Gitk qui est fourni de base avec msysgit et inclus dans les installation Git de Linux et MacOS X.
 Pour ouvrir Gitk:
 
 \begin{marginfigure}%
@@ -259,7 +259,7 @@ Plus tard, nous appliquerons toujours des modifications sur des branches isolée
 
 \subsection{Git add pour indexer un fichier non-suivi}
 
-Créeons un nouveau fichier avant d'exécuter \texttt{git status}:
+Créons un nouveau fichier avant d'exécuter \texttt{git status}:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ echo hello > newfile.txt
@@ -334,7 +334,7 @@ Ajoutons plus de contenu à notre nouveau fichier:
 no changes added to commit (use "git add" and/or "git commit -a")
 \end{lstlisting}
 
-Tapper \texttt{git commit} à ce stade ne créera aucune commit car les modifications apportées au fichier n'ont pas été indexées.
+Tapper \texttt{git commit} à ce stade ne créera aucun commit car les modifications apportées au fichier n'ont pas été indexées.
 Il est possible d'indexer toutes les modifications présentes dans le ficheir avec la même commande \texttt{git add}, précédemment utilisées pour indexer un fichier non-versionné:
 
 \begin{lstlisting}[style=BashInputStyle]
@@ -367,14 +367,14 @@ A présent, un \texttt{git commit} appliquera les modifications indexées dans u
 
 \subsection{Git add -p: l'indexation granulaire}
 
-L'une des techniques les plus propres pur indexer des modifications en ligne de commande et l'option \texttt{-p} de \texttt{git add}:
+L'une des techniques les plus propres pour indexer des modifications en ligne de commande et l'option \texttt{-p} de \texttt{git add}:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git add -p
 \end{lstlisting}
 
 Cela ne prend pas de nom de fichier en argument.
-\texttt{git add -p} initiera une session interactive durant laquelle chaque modification non-indexée (\texttt{hunk}) sera affichée. Pour chaque \texttt{hunk}, l'utilisateur décidera de l'ajouter à l'index ou de le laisser en état modified. \marginnote{Choix sur hunks de \texttt{git add -p}: \textbf{y}: indexer, \textbf{n}: ne pas indexer, \textbf{d}: ne pas indexer et sauter le reste du fichier, \textbf{s}: découper en \texttt{hunks} plus petits, si possible, et redemander.}
+\texttt{git add -p} initiera une session interactive durant laquelle chaque modification non-indexée (\texttt{hunk}) sera affichée. Pour chaque \texttt{hunk}, l'utilisateur décidera de l'ajouter à l'index ou de le laisser en état \texttt{modified}. \marginnote{Choix sur hunks de \texttt{git add -p}: \textbf{y}: indexer, \textbf{n}: ne pas indexer, \textbf{d}: ne pas indexer et sauter le reste du fichier, \textbf{s}: découper en \texttt{hunks} plus petits, si possible, et redemander.}
 Cette commande est très pratique car elle permet d'indexer des lignes de code plutôt que des fichiers entiers, ce qui veut dire que vous pouvez indexer un fichier partiellement.
 De cette façon, il est possible d'isoler des features dans des commits séparés, même si ces modifications partagent les mêmes fichiers.
 La sessions interactive s'achèvera lorsque toutes les modifications seront passées en revue.
@@ -456,7 +456,7 @@ Un autre racourcis bon à connaître mais dont il ne faut pas abuser est la poss
   $ git commit -am "One big commit"
 \end{lstlisting}
 
-Je préfère éviter ces deux dernières commandes car les commits devraient contenir des changements isolés et il est rare de travailler exclusivement sur un feature en particulier sans introduire de modifications superflues.
+Je préfère éviter ces deux dernières commandes car les commits devraient contenir des changements isolés et il est rare de travailler exclusivement sur un feature en particulier sans introduire de mo-difications superflues.
 L'option \texttt{-a} de \texttt{git commit} ne permet pas de passer en revue l'état de l'index avant d'appliquer les changement.
 Le fait de découpler les phases d'index et de commit permettent de visualiser l'index à l'aide de commandes telles que:
 
@@ -495,7 +495,7 @@ Enfin, il est possible de désindexer un fichier en particulier:
 Une suppression de fichier est une modification comme une autre dans Git.
 Il y a deux façon de supprimer un fichier.
 La méthode \textit{propre et recommandée} est de supprimer un fichier ou dossier directement avec la commande Git.
-Il est aussi possible de supprimer des fichiers ou dossiers sur son système de ficheirs sans passer par Git.
+Il est aussi possible de supprimer des fichiers ou dossiers sur son système de fichiers sans passer par Git.
 Même s'il est assez facile d'en avertir Git par la suite, ce n'est pas la méthode préconisée.
 \marginnote{Utilisateurs SVN: oui, cela peut sembler magique}
 Nous allons aborder les deux méthodes dans la prochaine section.
@@ -649,7 +649,7 @@ Afin de faire progresser la branche \texttt{feature} plutôt que \texttt{master}
 
 Nous pouvons maintenant ajouter des commits sur notre branche \texttt{feature}, comme nous l'avons fait auparavant pour \texttt{master}.
 Lorque nous sommes satisfait de notre travail, il est temps d'intégrer la branche \texttt{feature} dans \texttt{master}.
-Nous n'allons pas trop nous attardons sur ces opérations pour le moment, mais voici déjà une possibilité pour réaliser l'intégration:
+Nous n'allons pas trop nous attarder sur ces opérations pour le moment, mais voici déjà une possibilité pour réaliser l'intégration:
 
 \begin{marginfigure}%
   \centering
@@ -663,7 +663,7 @@ Nous n'allons pas trop nous attardons sur ces opérations pour le moment, mais v
   $ git merge feature
 \end{lstlisting}
 
-Si \texttt{master} n'a pas évolué depuis que nous avons créé la branche, elle se trouvera en ancêtre direct de notre branche, \texttt{feature}, et pourra être \textbf{fast-forwarded} vers \texttt{feature}
+Si \texttt{master} n'a pas évolué depuis que nous avons créé la branche, elle se trouvera en ancêtre direct de notre branche, \texttt{feature}, et pourra être \textbf{fast-forwarded} vers \texttt{feature}.
 S'il est préférable d'avoir un branchement explicite dans l'historique, il est possible de forcer la création d'un commit dit \texttt{merge commit} avec \texttt{no-ff}:
 
 \begin{marginfigure}%
@@ -678,8 +678,8 @@ S'il est préférable d'avoir un branchement explicite dans l'historique, il est
   $ git merge feature --no-ff
 \end{lstlisting}
 
-Ce commit additionel, a 2 parents: le dernier commit de chaque branche avant la fusion.
-En revanche, si master avec évolué depuis le branchement de feature, l'opération de merge aurait automatiquement créé ce merge commit.
+Ce commit additionel a 2 parents: le dernier commit de chaque branche avant la fusion.
+En revanche, si master avait évolué depuis le branchement de feature, l'opération de merge aurait automatiquement créé ce merge commit.
 
 Dans la prochaine session, nous allons explorer les workflows avec branches multiples, développeurs multiples et aborder d'autres façons d'intégrer des changements, tels que \textbf{rebase}.
 
