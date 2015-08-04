@@ -61,7 +61,7 @@ This handout is supplementary material to \texttt{Part II: Single User Operation
 
 Before discovering the many wonders offered by Git's history-editing, be aware that this priviledge should be used with care.
 
-Changing the history of a branch \textbf{which has already been shared to other people} is not a good practice, because those people will have to \texttt{reset --hard} their work to your new branch and apply their modifications on top of it.
+Changing the history of a branch \textbf{which has already been shared to other people} is asking for trouble, because those people will have to \texttt{reset --hard} their work to your new branch and apply their modifications on top of it.
 
 \begin{marginfigure}%
   \centering
@@ -85,14 +85,15 @@ The simplest form of history modification is changing the last commit:
 \end{lstlisting}
 
 This command opens up the last commit message, and allows you to alter the message.
-It also takes whatever is in the staging area and combines it with the previous commit, instead of creating a new commit.
+It also takes whatever was added to the staging area (via \texttt{git add}) and combines it with the previous commit, instead of creating a new commit.
 Thus, this is for both \textbf{rewording the last commit} and \textbf{altering the contents of the last commit}.
 
-Let's reword the last commit message of lesson1 in its initial state:
+Let's reword the last commit message of the master branch of the lesson1 repository:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git clone git@gitlab.server.com:login/lesson1
   $ cd lesson1
+  $ git checkout master # not necessary
   $ git log --oneline
   $ gitk --all
   $ git commit --amend -m "New message"
@@ -135,7 +136,7 @@ Suppose we wanted to alter the commit messages of HEAD\textasciitilde1 and HEAD\
 \end{lstlisting}
 
 The means we take the HEAD, and rebase it on a commit which is 3 commits away.
-This will undo HEAD, HEAD\textasciitilde1 and HEAD\textasciitilde2, and apply them on top of HEAD\textasciitilde3 in reverse order (HEAD\textasciitilde2, HEAD\textasciitilde1, HEAD).
+This will undo HEAD, HEAD\textasciitilde1 and HEAD\textasciitilde2, and apply them on top of HEAD\textasciitilde3 in reverse order (HEAD\textasciitilde2, HEAD\textasciitilde1, HEAD). \marginnote{without the -i option, this command has no effect.}
 With the -i option, an editor pops up to prompt us if we want to take any action when picking each commit:
 
 \begin{lstlisting}[style=BashInputStyle]
@@ -194,7 +195,7 @@ The final history after the first amend operation and this rebase and its relati
 
 \noindent We have covered the general mechanism of git rebase in interactive mode. 
 We will now have a small preview of more advances operation which can be done with rebase.
-First, let's undo out changes by reset or local master branch to the state of origin/master:
+First, let's undo our changes by reset our local master branch to the state of origin/master:
 
 \begin{lstlisting}[style=BashInputStyle]
   git reset --hard origin/master

@@ -229,6 +229,7 @@ To open Gitk:
 This is by far the fastest and easiest way to get an overview of the local and remote branches.
 In Gitk, the local branches are green, the current local branch is green and bold, and remote branches are prefixed with a peach path.
 Our project also has a yellow label, which is a tag.
+\maginnote{You can't move a tag, but you can delete it and create one elsewhere with the same name. Note that doing so will lead to problems if this tag has already been shared to other Git clients (they won't detect the change without deleting the tag locally)}
 Like a branch, a \texttt{tag} is little more than a label on a certain commit, the main difference being that a tag is designed to be permanent to label an important point in the project history for future reference (code release, development milestone...), whereas a branch is meant to evolve.
 We'll get back to branches and tags later.
 
@@ -334,7 +335,7 @@ no changes added to commit (use "git add" and/or "git commit -a")
 \end{lstlisting}
 
 Typing \texttt{git commit} at this point will not apply anything, because the modifications have not been added to the staging area.
-It is possible to apply changes on a file basis in the same way as we have staged an untracked file previously:
+It is possible to apply changes on a file in the same way as we have staged an untracked file previously:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git add newfile.txt
@@ -626,9 +627,10 @@ The working tree is left entirely intact when a branch is created.
     §remotes/origin/master§
 \end{lstlisting}
 
-We have a new local branch called feature branch, currently pointing to the same commit as master.
-We are not quite ready to start applying changes, because \texttt{git branch} and \texttt{git status} tell us that we are still in master.
-To progress in the \texttt{feature} branch rather then \texttt{master} we must use \textbf{checkout}:
+We have a new local branch called \texttt{feature}, currently pointing to the same commit as \texttt{master}.
+\marginnote{Don't be fooled by the fact that there is no visible "branching" in the history. In reality, we haven't modified anything: the 2 branches are identical.}
+We are not quite ready to start applying changes, because \texttt{git branch} and \texttt{git status} tell us that we are still in \texttt{master}.
+To progress in the \texttt{feature} branch rather then \texttt{master} we must use \textbf{git checkout}:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git checkout feature
@@ -658,7 +660,7 @@ We will not go into too much details for now, but the general idea is:
 \end{lstlisting}
 
 If master has not progressed since we branched off with feature, the master branch will be \textbf{fast-forwarded} to the feature branch.
-If a branching history is preferred, we can force it with \texttt{no-ff}:
+If a branching history is preferred, we can force the creation of a \texttt{merge commit} with \texttt{no-ff}:
 
 \begin{marginfigure}%
   \centering
@@ -672,7 +674,7 @@ If a branching history is preferred, we can force it with \texttt{no-ff}:
   $ git merge feature --no-ff
 \end{lstlisting}
 
-This creates an additional commit, called a merge commit, with 2 parents: the last commit on each branch prior to the merge.
+This additional commit, called a merge commit, has 2 parents: the last commit on each branch prior to the merge.
 If master \textit{did} progress since we branched off with the feature branch, the merge operation will automatically result in an extra merge commit.
 
 In the next session, we will dig further into workflows dealing with multiple branches, multiple people, and learn other ways to integrate changes such as \textbf{rebase}.
