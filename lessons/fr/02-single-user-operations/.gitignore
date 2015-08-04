@@ -1,0 +1,8 @@
+02a-single-user-operations-fr.pdf
+02b-ignoring-files-fr.pdf
+02c-rewriting-history-fr.pdf
+*.aux
+*.out
+*.log
+*.blg
+*.bbl

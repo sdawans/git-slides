@@ -1,0 +1,186 @@
+% !Mode:: "TeX:UTF-8"
+\documentclass{../../common/tufte-latex/tufte-handout}
+
+\title{Git en Pratique, partie II-b: Ignorer des Fichiers}
+\author{S\'ebastien Dawans}
+
+\date{4 Ao\^ut 2015} % without \date command, current date is supplied
+
+%\geometry{showframe} % display margins for debugging page layout
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx} % allow embedded images
+  \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+  \graphicspath{{graphics/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{lipsum}   % filler text
+\usepackage{fancyvrb} % extended verbatim environments
+  \fvset{fontsize=\normalsize}% default font size for fancy-verbatim environments
+\usepackage{listings}
+\lstset{showstringspaces=false}
+\usepackage[usenames]{xcolor}
+\usepackage{hyperref}
+
+\lstdefinestyle{BashInputStyle}{
+  language=bash,
+  basicstyle=\footnotesize\ttfamily,
+  %numbers=left,
+  %numberstyle=\tiny,
+  %numbersep=3pt,
+  frame=tb,
+  columns=fullflexible,
+  backgroundcolor=\color{yellow!20},
+  linewidth=0.95\linewidth,
+  xleftmargin=0.05\linewidth,
+  moredelim=**[is][\color{red}]{§}{§},
+  moredelim=**[is][\color{OliveGreen}]{`}{`}
+}
+
+% Standardize command font styles and environments
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+
+\begin{document}
+
+\maketitle% this prints the handout title, author, and date
+
+\begin{abstract}
+\noindent
+Ce document est fourni en annexe à la \texttt{Partie II: Op\'erations en solo}. Il explique comment ignorer des fichiers dans Git et comment se ratrapper lorsqu'on a malencontreusement versionné des fichiers à ignorer.
+\end{abstract}
+
+\section{Ignorer des Fichiers}
+\label{section:ignore}
+Dans beaucoup de langages et environnements, il y a des fichiers que nous ne souhaitons (ou ne devrions) pas versionner.
+Tout fichier généré à partir de fichiers sources et suceptible de changer à chaque compilation ne devrait en principe pas être versionné.
+De même, des fichiers de grande taille devraient être traités en dehors de git, même si ceux-ci ne sont pas forcément regénérés fréquemment.
+\marginnote{Parmi plusieurs initiatives pour gérer les gros fichiers dans Git, la plus récente et prometteuse est Git LFS, \url{https://git-lfs.github.com/}.}
+Typiquement il s'agit de gros fichiers binaires ou de dépendences runtime d'un projet telle qu'une librairie ou des datasets.
+Git peut ignorer certains fichiers à l'aide de règles.
+Un fois ignorés les fichiers untracked restent untracked sans encombrer la sortie de \textbf{git status}.
+
+\subsection{Les fichiers .gitignore}
+Il y a plusieurs façon de préciser à git d'ignorer des fichiers par patterns, le plus courant état l'utilisation de fichiers \textbf{.gitignore} dans le working tree et versionnés comme des fichiers source normaux.
+\marginnote{L'aide \textbf{git help gitignore} fourni une liste d'autres méthodes pour ignorer des fichiers. Notez qu'il y a une ordre de priorités.}
+
+Il est important de définir un fichier \textbf{.gitignore} le plus tôt possible dans la vie d'un projet Git.
+Il est très bien vu de créer un .gitignore dès la création d'un nouveau repository et de l'inclure dans le premier commit, même si celui-ci est vide.
+Lorsqu'on ajoute du code existant à Git, il est encore plus important d'avoir le .gitignore configuré correctement avant d'indexer tout le projet récursivement, car il y a de fortes chances que l'arborescence contiennent déjà des fichiers à ignorer.
+
+\noindent \textbf{Exemple}.
+Prenons un projet en C avec des fichiers .c, un Makefile et un binaire généré.
+Supposons qu'on vienne tout juste de créer \texttt{hello.c} et un Makefile adapté avant de compiler:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git status
+  On branch master
+  Untracked files:
+    (use "git add <file>..." to include in what will be committed)
+  
+      §Makefile§
+      §hello.c§
+      §hello.exe§
+
+nothing added to commit but untracked files present (use "git add" to track)
+\end{lstlisting}
+
+Si l'on exécute \texttt{git add .} ici, les trois fichiers seront ajoutés à Git.
+Or, si nous voulons ignorer le fichier généré, il faut le faire avant le git add. Pour cela, nous pouvons décider d'exclure tous les fichiers avec l'extension ".exe" en créant un .gitignore avec \textbf{*.exe} comme première ligne:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ touch .gitignore
+  $ echo "*.exe" >> .gitignore
+\end{lstlisting}
+
+Au prochain \texttt{git status}, le fichier binaire sera ignoré:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git status
+  On branch master
+  Untracked files:
+    (use "git add <file>..." to include in what will be committed)
+  
+      §.gitignore§
+      §Makefile§
+      §hello.c§
+
+nothing added to commit but untracked files present (use "git add" to track)
+\end{lstlisting}
+
+Nous avons un nouveau fichier untracked, qui n'est autre que notre nouveau .gitignore.
+Nous pouvons à présent ajouter tout le projet et créer notre premier commit:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git add .
+  $ git commit -m "Initial Commit: adding the project files"
+\end{lstlisting}
+
+Dans Git, les fichiers .gitignore font partie du working tree et doivent être committés comme tout autre fichier source.
+Ceci est très pratique, car cela permet de propager des patterns à ignorer sur les autres clients Git.
+Les usagers occasionnels du projet ne doivent donc pas se soucier des .gitignore, en général, car ceux-ci auront été configurés correctement par les mainteneurs du projet, plus à même de décider quels fichiers doivent être ignorés.
+
+\subsection{Oublié d'ignorer des fichiers?}
+Il se pourrait que vous n'ayez pas ignoré tout ce qui était nécessaire.
+Si vous avez accidentellement versionné des fichiers, il est possible de les ignorer plus tard.
+En supposant que le fichier n'a pas besoin d'être sur le repository, nous pouvons réutiliser la commande vue à la partie II: \texttt{git rm} avec l"option \texttt{cached}.
+
+Si un fichier \texttt{hello.exe} fait partie de repository et que nous souhaitons l'ignorer, nous devons effectuer la suppression et l'édition du .gitignore simultanément: 
+\marginnote{Pour rappel, l'option \textbf{cached} préserve une copie locale du fichier à supprimer du repo. Ce n'est pas particulièrement utile ici car notre Makefile peut regénérer le binaire à partir de hello.c.}
+\begin{lstlisting}[style=BashInputStyle]
+  $ git rm --cached hello.exe
+  $ echo "*.exe" >> .gitignore
+  $ git add .gitignore
+  $ git commit -m "Remove file hello.exe and ignore all *.exe files"
+\end{lstlisting}
+
+Notons que cette procédure n'est pas suffisante si vous souhaitez retirer un gros fichier binaire du repository, pour des raisons de performance, car le fichier sera encore dans l'historique et le \texttt{blob} correspondant sera encore dans les objets gu repo.
+Pour supprimer définitivement un objet du repository requiert que toutes les références vers ce blob soient supprimées de toutes les branches, suivi d'un garbage collection pour supprimers le blobs non-référencés.
+C'est une opération non-trivial et au-délà de cette formation.
+
+\subsection{Ignorer un fichier versionné sans le retirer de Git}
+Moins fréquemment, il vous sera peut-être utile d'ignorer des modifications locales apportées à un fichier qui doit rester sous contrôle de version.
+Par example un développeur pour modifier des parties d'un fichier source pour du debug, tel qu'un flag de debug, ou insérer ses données utilisateur dans un script pour automatiser l'accès à une base de données.
+Ignorer les modifications locales dans un tel fichier nettoie la sortie de \texttt{git status} et évite d'indexer ces modifications accidentellement, surtout si vous utilisez des raccourcis comme \texttt{git commit -a}. \marginnote{committer un mot de passe peut-être gênant!}
+Vous ne pouvez pas simplement maintenir un fichier .gitignore (non suivi) pour cela, car \textbf{.gitignore ne s'applique qu'aux fichiers untracked}; vous ne pouvez pas ignorer un fichier faisant déjà partie d'un repo.
+\marginnote{Un .gitignore local non-versionné ne serait d'ailleurs pas une solution propre, même si elle fonctionnait, car il resterait le problème du .gitignore lui-même qui doit être ignoré.}
+
+Une solution relativement plus simple est de temporairement ignorer les changements dans un ficheir local:
+\begin{lstlisting}[style=BashInputStyle]
+  $ git update-index --assume-unchanged <file>
+\end{lstlisting}
+\marginnote{Bien que cette solution existe et peut s'avérer utile, il est préférable de ne pas introduire ce genre de besoin en structurant les sources correctement. En général, un projet peut être conçu de manière à ce que d'éventuels fichiers de configuration utilisateur puissent être générés localement, et explicitement ignorés dans un .gitignore.}
+Cela active un flag attribué au fichier, qui est propre au client, et qui le marque comme un fichier à ignorer.
+Le fichier continuera à recevoir des mises à jour, mais toute modification locale sera ignorée.
+Pour retirer ce flag:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git update-index --no-assume-unchanged <file>
+\end{lstlisting}
+
+Il est possible de lister tous les fichiers ignorés de cette manière:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git ls-files -v | grep ^[a-z]
+\end{lstlisting}
+
+Ces 3 alias sont utiles à inclure dans votre \textasciitilde/.gitconfig:
+
+\begin{lstlisting}[style=BashInputStyle]
+[alias]
+        ignore = !git update-index --assume-unchanged 
+        unignore = !git update-index --no-assume-unchanged
+        ignored = !git ls-files -v | grep ^[a-z]
+\end{lstlisting}
+
+\bibliography{../common/refs}
+\bibliographystyle{plainnat}
+
+\end{document}

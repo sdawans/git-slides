@@ -4,7 +4,7 @@
 \title{Git en Pratique, partie I: Introduction \& Installation}
 \author{S\'ebastien Dawans}
 
-%\date{21 January 2014} % without \date command, current date is supplied
+\date{4 Ao\^ut 2015} % without \date command, current date is supplied
 
 %\geometry{showframe} % display margins for debugging page layout
 \usepackage[utf8]{inputenc}
@@ -68,7 +68,7 @@ Le public cible pour la session est l'un ou plusieurs développeurs ayant déjà
 
 Git est un outil de gestion de code source (SCM) avec trois principes de base.
 Git est \textbf{Distribué}, \textbf{Rapide} et \textbf{Fiable}.
-Il est très différent de non seulement les outils centralisés comme SVN, mais aussi des autres SCMs distribués comme Mercurial.
+Il est très différent non seulement des outils centralisés comme SVN, mais aussi des autres SCMs distribués comme Mercurial.
 Pour mieux suivre cette séance introductive, il est préférable d'oublier les autres SCMs, y compris le vocabulaire qu'ils emploient, car certains fausses similitudes peuvent être déroutantes au début.
 
 \section{Installation: Git en ligne de commande}
@@ -83,23 +83,23 @@ Bien qu'il existe plusieurs clients graphiques pour Git tels que SourceTree, Sma
  \marginnote{Cela est particulièrement vrai lorsqu'on aborde les submodules - il est pratiquement impossible d'apprendre le fonctionnement des submodules sans ligne de commande} 
  Les GUIs combient parfois plusieurs opérations Git en une. Cela peut convenir pour certains usages mais au prix de flexibilité et moyens de debug.}
  \item{\textbf{Les GUIs ne vous dépanneront pas}. 
- \marginnote{Lorsqu'on me demande de l'aide avec Git, je commence systématiquement pour ouvir un ligne de commande}
+ \marginnote{Lorsqu'on me demande de l'aide avec Git, je commence systématiquement par ouvir un ligne de commande}
  De temps à autre, même l'utilisateur Git le plus assidu rencontrera des situations inattendues. D'après mon expérience, il est bien plus simple d'analyser et résoudre une telle situation depuis une console que derrière un GUI.}
- \item{\textbf{C'est plus facile en group}. Plus simplement, le fait de suivre une formation données en ligne de commande permet à chacun d'utiliser exactement la même interface. Cela garanti une expérience uniforme dans le groupe.}
+ \item{\textbf{C'est plus facile en groupe}. Plus simplement, le fait de suivre une formation donnée en ligne de commande permet à chacun d'utiliser exactement la même interface. Cela garanti une expérience uniforme dans le groupe.}
 \end{enumerate}
 
-Cela dit, une client graphique pourra tout de même améliorer votre productivité plus tard, lorsque vous serez à l'aise avec les commandes de base.
+Cela dit, un client graphique pourra tout de même améliorer votre productivité plus tard, lorsque vous serez à l'aise avec les commandes de base.
 
 \subsection{Installer un Git client sur MacOS X et Linux}
 
 Les utilisateurs Linux et MacOS X trouveront un client git natif dans leur gestionnaire de dépôt.
 
-Sur certaines distributions Linux, le client git n'est pas toujours très à jour par rapport aux binaires Windows. \marginnote{\url{https://git-scm.com/book/en/v2/Getting-Started-Installing-Git}} donc il peût-être utile d'installer la version la plus récente depuis les sources. Cela n'est cepedant pas nécessaire pour suivre la formation.
+Sur certaines distributions Linux, le client git n'est pas toujours très à jour par rapport aux binaires Windows. \marginnote{\url{https://git-scm.com/book/en/v2/Getting-Started-Installing-Git}} Il peut donc être utile d'installer la version la plus récente depuis les sources. Cela n'est cepedant pas nécessaire pour suivre la formation.
 
 \subsection{Installer un Git client sur Windows}\label{sec:preparation}
 
-Les utilisateurs Windows doivent installaer la dernière version de TortoiseGit \marginnote{\url{http://code.google.com/p/tortoisegit/}} (uniquement pour le binaire TortoisePlink.exe) and msysgit \marginnote{\url{http://code.google.com/p/msysgit/}}, dans cet ordre.
-Par ailleurs, les utilisateur windows devront installer puttygen.exe et pageant.exe, disponible sur le site de Putty \marginnote{\url{http://www.putty.org/}}. Ceux-ci doivent être stockés à un emplacement connu. En générale, je les place dans 
+Les utilisateurs Windows doivent installer la dernière version de TortoiseGit \marginnote{\url{http://code.google.com/p/tortoisegit/}} (uniquement pour le binaire TortoisePlink.exe) et msysgit \marginnote{\url{http://code.google.com/p/msysgit/}}, dans cet ordre.
+Par ailleurs, les utilisateur Windows devront installer puttygen.exe et pageant.exe, disponibles sur le site de Putty \marginnote{\url{http://www.putty.org/}}. Ceux-ci doivent être stockés à un emplacement connu. En générale, je les place dans 
 
 \begin{lstlisting}[style=BashInputStyle]
   C:\bin\ssh\
@@ -108,13 +108,13 @@ Par ailleurs, les utilisateur windows devront installer puttygen.exe et pageant.
 \begin{itemize}
 
 \item{Une pair de clés SSH doit être générée avec puttygen}
-\item{La clé publique affichée dans la fenêtre puttygen doit être copié/collée dans la configuration de compte utilisateur sur votre gestionnaire Git (Github, Gitlab, Gitolite, Redmine...) tandis que la clé privée devra être enregisrée sur votre PC et ajoutée à Pageant} \marginnote{Losque vous copiez votre clé publique dans GitLab / Redmine, etc, assurez-vous de bien copier depuis le GUI puttygen et non pas depuis le fichier de clé publique. Cela évite une erreur fréquemment rencontrée lorsqu'on fourni un clé qui n'est pas en format OpenSSH.}
+\item{La clé publique affichée dans la fenêtre puttygen doit être copiée/collée dans la configuration de compte utilisateur sur votre gestionnaire Git (Github, Gitlab, Gitolite, Redmine...) tandis que la clé privée devra être enregistrée sur votre PC et ajoutée à Pageant} \marginnote{Losque vous copiez votre clé publique dans GitLab / Redmine, etc, assurez-vous de bien copier depuis le GUI puttygen et non pas depuis le fichier de clé publique. Cela évite une erreur fréquemment rencontrée lorsqu'on fourni un clé qui n'est pas en format OpenSSH.}
 \item{Optionnellement, vous pouvez créer un script batch qui lance pageant.exe au démarrage de votre machine et qui y ajoute automatiquement la clé privée.}
 \item{Créez une nouvelle variable d'environnement Windows nommée GIT\_SSH et pontant sur TortoisePlink.exe, installé avec TortoiseGit:}
 \begin{lstlisting}[style=BashInputStyle]
   GIT_SSH = C:\Program Files\TortoiseGit\bin\TortoisePlink.exe
 \end{lstlisting}
-\item{Après la création de cette variable d'environnement, vous devez fermer et rouvrir toute éventuellement console Git. Depuis Git Bash, vérifiez la bonne configuration de GIT\_SSH en tappant:}
+\item{Après la création de cette variable d'environnement, vous devez fermer et rouvrir toute éventuelle console Git. Depuis Git Bash, vérifiez la bonne configuration de GIT\_SSH en tappant:}
 
 \begin{lstlisting}[style=BashInputStyle]
   $ echo $GIT_SSH
@@ -156,7 +156,7 @@ Par exemple, pour utiliser Notepad++ comme éditeur préféré:
     "'C:/path/to/notepad++.exe' -multiInst -notabbar -nosession -noPlugin"
 \end{lstlisting}
 
-A ce stade, il est utile de remarque que les \texttt{git config} ci-dessus utilisent l'option \texttt{--global}  pour stocker la configuration dans un fichier global à l'utilisateur de la machine, stocké dans 
+A ce stade, il est utile de remarquer que les \texttt{git config} ci-dessus utilisent l'option \texttt{--global}  pour stocker la configuration dans un fichier global à l'utilisateur de la machine, stocké dans 
 
 \begin{lstlisting}[style=BashInputStyle]
   ~/.gitconfig
@@ -176,7 +176,7 @@ Sans l'option \texttt{--global}, la commande \texttt{git config} applique des co
   git config [--global] --edit
 \end{lstlisting}
 
-\noindent Pour une liste complète de paramètres globaux et redéfinis localement, utilisez
+\noindent Pour une liste complète de paramètres globaux et redéfinis localement, utilisez:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git config --list
@@ -208,7 +208,7 @@ Chaque repo hébergé sur Gitlab dispose d'une URL unique, en général \\ \noin
 
 Le \textbf{namespace} peut être de deux types: un namespace propre à chaque utilisateur, ou des namespaces de groupes.
 
-Bien que la procédure d'installation officielle de Gitlab renseignée dans le README et très simple à utiliseur, certains utilisateurs opteront plutôt pour des images Gitlab toutes faites, telles que celles fournies par Bitnami. 
+Bien que la procédure d'installation officielle de Gitlab renseignée dans le README et très simple à utiliser, certains utilisateurs opteront plutôt pour des images Gitlab toutes faites, telles que celles fournies par Bitnami. 
 
 \textbf{Redmine + Gitolite}
 
@@ -231,16 +231,16 @@ La denière étape de configuration consiste à vérifier l'état de la connexio
 \end{marginfigure}
 \marginnote{Un argument supplémentaire peut être fourni poru spécifier le nom du dossier en local}
 \marginnote{Le protocole SSH est implicite en utilisant le format d'URL user@server. C'est équivalent à ssh://user@server}
-Nous pouvons tenter de \textbf{clone} un repository existant for cela.
+Nous pouvons tenter de \textbf{cloner} un repository existant for cela.
 En jargon Git, \texttt{clone} consiste à copier un repository complet depuis un serveur distant vers sa machine locale.
 Contraitement à des SCMs centralizés comme SVN, \texttt{git clone} par défaut copiera chaque information nécessaire pour reconstituer une quelconque version du projet depuis le début.
-C'est pour cela que l'on parle d'un outil distribué: chaque clône est en réalité un repository complet à part entière.
+C'est pour cela que l'on parle d'un outil distribué: chaque clone est en réalité un repository complet à part entière.
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git clone git@gitlab.server.com:login/lesson1 [folder]
 \end{lstlisting}
 
-\noindent Lorsque la connection fonctionne, git clônera le repository et renverra quelques détails sur l'opération:
+\noindent Lorsque la connection fonctionne, git clonera le repository et renverra quelques détails sur l'opération:
 
 \begin{lstlisting}[style=BashInputStyle]
   Cloning into 'lesson1'...
@@ -251,7 +251,7 @@ C'est pour cela que l'on parle d'un outil distribué: chaque clône est en réal
   Resolving deltas: 100% (3/3), done.
 \end{lstlisting}
 
-Un nouveau répertoire \texttt{lesson1} apparaître dans le dossier courant.
+Un nouveau répertoire \texttt{lesson1} apparaîtra dans le dossier courant.
 Le repository Git (dossier \texttt{.git}) et le \texttt{working tree} sont tous les deux contenus dans le répertoire \texttt{lesson1}
 \marginnote{\texttt{lesson1}, comme tout repository Git, est entièrement autonome et peut être déplacer sur votre machine sans risque.}
 
