@@ -134,8 +134,10 @@
 \settowidth{\MyLen}{\texttt{organization.}}
 \begin{tabular}{@{}p{\the\MyLen}@{}p{\linewidth-\the\MyLen}@{}}
 \verb!HEAD!                & A pointer to the current branch. \\
-\verb![commit-ish]!      & An identifier that ultimately leads to a \texttt{commit} object. \\
-\verb![tree-ish]!         & An identifier that ultimately leads to a \texttt{tree} object. \\
+\verb!commit-ish!      & An identifier that ultimately leads to a \texttt{commit} object. Shortened as \texttt{<ref>} \\
+\verb!tree-ish!         & An identifier that ultimately leads to a \texttt{tree} object. \\
+\texttt{<ref>\string~\string{n\string}}        & n-th generation ancestor of \texttt{<rev>}. Example: \texttt{HEAD\string~2} \\
+\texttt{<ref>\string^\string{n\string}}        & n-th parent of \texttt{<rev>}. Example: \texttt{HEAD\string^2} \\
 \end{tabular}
 \end{mdframed}
 
@@ -180,10 +182,13 @@ Global client configuration is stored in \texttt{\~.gitconfig} and can be edited
 \begin{tabular}{@{}p{\the\MyLen}%
                 @{}p{\linewidth-\the\MyLen}@{}}
 \texttt{git status} & List modified, untracked, staged \\
+\texttt{git branch} & List all local branches \\
+\texttt{git branch -a} & List all local and remote branches \\
 \texttt{git diff} & View non-indexed changes (since \texttt{HEAD}) \\
 \texttt{git diff --cached} & View indexed changes (since \texttt{HEAD}) \\
 \texttt{git remote [-v]} & List all remotes [and their URLs] \\
 \texttt{git show [commit]} & Dump changeset introduced in \texttt{[commit]}. Defaults to \texttt{HEAD}. \\
+\texttt{git blame [file]} & Dump file contents with annotations of the last commit that modified each line. \\
 \texttt{gitk --all \&} & Nice GUI for viewing both local and remote branches \\
 \texttt{tig} & Text mode repository browser \\
 \end{tabular}
@@ -201,9 +206,13 @@ Global client configuration is stored in \texttt{\~.gitconfig} and can be edited
 \texttt{git add -u} & Index all modified files and deletions. Do nothing to untracked content. \\
 \texttt{git add -A} & Same as \texttt{git add . \&\& git add -u} \\
 \texttt{git reset -- [file]} & Unstage all contents of \texttt{[file]} \\
+\texttt{git checkout <ref> -- [file]} & Write to disk the version of \texttt{[file]} from \texttt{<ref>}. \\
 \texttt{git rm [file]} & Stage the removal of \texttt{[file]}, and delete it from the working tree. \\
 \texttt{git rm --cached  [file]} & Stage the deletion of \texttt{[file]}, but keep it locally as untracked. \\
-\texttt{git commit -m <txt>} & Apply the staged modifications to \texttt{HEAD} \& make a new commit out of it. \\
+\texttt{git rm -r [dir]} & Stage the removal of a directory \& contents recursively. \\
+\texttt{git commit -m \string"..\string\"} & Apply the staged modifications to \texttt{HEAD} \& make a new commit out of it. \\
+\texttt{git commit -am \string"..\string\"} & Stage all modifications, then commit. \\
+\texttt{git revert <ref>} & Undo changes introduced in \texttt{<ref>} by applying a new commit. \\
 \end{tabular}
 \end{mdframed}
 
@@ -227,13 +236,33 @@ To undo \texttt{git rm [file]} is a 2-step process.
 \end{tabular}
 \end{mdframed}
 
-\subsection{Branching}
+\subsection{Branch Operations}
 \begin{mdframed}[style=mystyle]
-\settowidth{\MyLen}{\texttt{git reset -- [file]} }
+\settowidth{\MyLen}{\texttt{git checkout <br>.} }
 \begin{tabular}{@{}p{\the\MyLen}%
                 @{}p{\linewidth-\the\MyLen}@{}}
-\texttt{git branch <br>} & create a branch called \texttt{<br}, at \texttt{HEAD}.\\
-\texttt{git branch <br> [commit-ish]} & create a branch at [commit-ish].\\
+\texttt{git branch <br>} & create a branch called \texttt{<br>}, at \texttt{HEAD}.\\
+\texttt{git branch <br> [ref]} & create a branch at [ref].\\
+\texttt{git checkout <br>} & switch to branch \texttt{<br>} \\
+\texttt{git checkout <ref>} & switch to the commit referenced by the \texttt{<ref>}. Will be in detached head mode if it is not a branch name. \\
+\texttt{git reset <ref>} & move the current branch to \texttt{<ref>}, preserving the modifications (set as unstaged). \\
+\texttt{git reset --soft <ref>} & move the current branch to \texttt{<ref>}, preserving the modifications (set as staged). \\
+\texttt{git reset --hard <ref>} & move the current branch to \texttt{<ref>}, dropping all differences and local modifications. \\
+\texttt{git merge <ref>} & Incoporated changes from \texttt{<ref>} into the current branch. \\
+\texttt{git merge --no-ff <ref>} & Force a merge commit, even when fast-forward is possible. \\
+\end{tabular}
+\end{mdframed}
+
+\subsection{Synchronizing with Remotes}
+\begin{mdframed}[style=mystyle]
+\settowidth{\MyLen}{\texttt{git push <alias> <a>[:b]} }
+\begin{tabular}{@{}p{\the\MyLen}%
+                @{}p{\linewidth-\the\MyLen}@{}}
+\texttt{git fetch <alias>}        & \\
+\texttt{git push <alias> <br> }    & write branch \texttt{<br>} to remote called \texttt{alias} \\
+\texttt{git push <alias> <a>[:b]} & write branch \texttt{<a>} to remote called \texttt{alias} and name it \texttt{<b>}. \\
+\texttt{git push  -f ...}          & overwrite a branch, if necessary \\
+\texttt{git push <alias> --tags}    & send all tags \\
 \end{tabular}
 \end{mdframed}
 
