@@ -1,5 +1,5 @@
 % !Mode:: "TeX:UTF-8"
-\documentclass{../../common/tufte-latex/tufte-handout}
+\documentclass[a4paper]{../../common/tufte-latex/tufte-handout}
 
 \title{Git hands-on, part II-c: Rewriting History}
 \author{S\'ebastien Dawans}
@@ -63,7 +63,7 @@ This handout is supplementary material to \texttt{Part II: Single User Operation
 
 Before discovering the many wonders offered by Git's history-editing, be aware that this priviledge should be used with care.
 
-Changing the history of a branch \textbf{which has already been shared to other people} is asking for trouble, because those people will have to \texttt{reset --hard} their work to your new branch and apply their modifications on top of it.
+Changing the history of a branch \textbf{which has already been shared to other people} is asking for trouble, because those people will have to \texttt{reset -{}-hard} their work to your new branch and apply their modifications on top of it.
 
 \begin{marginfigure}%
   \centering
@@ -71,13 +71,17 @@ Changing the history of a branch \textbf{which has already been shared to other 
   \label{fig:spiderman}
 \end{marginfigure}
 
-Rewriting history is a great way of cleaning one's work before pushing, but should not be used a posteriori on an important branch (master, develop). \marginnote{Implied here: it's still OK to force push your personal feature branches, but don't let it become a habit} Git takes care of guarding you from such actions by requiring the \texttt{--force} option to the \texttt{push} command whenever it detects a change in an existing branche's history.
+Rewriting history is a great way of cleaning one's work before pushing, but should not be used a posteriori on an important branch (master, develop).
+\marginnote{Implied here: it's still OK to force push your personal feature branches, but don't let it become a habit}
+Git takes care of guarding you from such actions by requiring the \texttt{-{}-force} option to the \texttt{push} command whenever it detects a change in an existing branch's history.
 
-If you ever have doubts about when it is ok or not to rewrite history, use \textbf{this simple rule: do not modify history pushed on a shared repository.}
+If you ever have doubts about when it is ok or not to rewrite history, use \textbf{this simple rule: do not modify the history of a branch pushed on a shared repository.}
 
 \section{Rewriting History}
 Git gives lots of power to the user and allows to rewrite the history.
-This can be \textbf{rewording} commit messages, \textbf{combining} commits, \textbf{splitting} a large commit into smaller ones, \textbf{deleting} a commit, \textbf{reordering} commits, changing the \textbf{date and authoring} information, etc.
+We are now going to see which types of operations result in a change of history and how we can use this to our advantage.
+
+A history modification can be \textbf{rewording} commit messages, \textbf{combining} commits, \textbf{splitting} a large commit into smaller ones, \textbf{deleting} a commit, \textbf{reordering} commits, changing the \textbf{date and authoring} information, changing the \textbf{contents of a commit}, etc.
 
 \subsection{Amending the last commit}
 The simplest form of history modification is changing the last commit:
@@ -112,27 +116,28 @@ Let's reword the last commit message of the master branch of the lesson1 reposit
 
 The output of gitk at the 2 steps is shown in Figure \ref{fig:gitcommit-amend}.
 We can see that ammending the commit creates a divergence between out local master branch's history and that of the remote's.
-The change in history means \textbf{you cannot git push} without the \texttt{--force} option. \marginnote{Since a commit's HASH reflects the state of the working tree and all commit-related metainfo (author, commit message, date...) changing any of these is considered a modification}
+The change in history means \textbf{you cannot git push} without the \texttt{-{}-force} option. \marginnote{Since a commit's HASH reflects the state of the working tree and all commit-related metainfo (author, commit message, date...) changing any of these is considered a modification}
 In fact, doing so will raise an error because git refuses to push work on a branch which does not pick up from the branch's last commit in its exact state, (HASH-wise).
+In other words, the last commit of the remote branch on which you are trying to push must be a direct ancestor of your local branch.
 
 \subsection{More thorough history modifications with interactive rebase}
 Amending the last commit only scratches the surface of history modifications.
 A more general and powerful command to edit history is the interactive rebase command.
 
-To \textbf{rebase} the HEAD on a certain tree-ish, means to:
+To \textbf{rebase} the HEAD on a certain \texttt{commit-ish}, means to:
 
 \begin{enumerate} 
- \item{rewind both the HEAD and the specified tree-ish until obtaining a common point in history}
- \item{apply the commits belonging to HEAD, missing from the tree-ish on top of that tree-ish}
+ \item{rewind both the HEAD and the specified \texttt{commit-ish} until obtaining a common point in history}
+ \item{apply the commits belonging to HEAD, missing from the \texttt{commit-ish} on top of that \texttt{commit-ish}}
  \item{continuously move the current HEAD to the latest commit as the patches are applied}
 \end{enumerate}
 
 This is a very general command used in different contexts.
-When applying each commit on the new base, we can tell git to perform extra operations are each step when invoking \textbf{rebase in interactive mode}.
+When applying each commit on the new base, we can tell git to perform extra operations at each step by invoking \textbf{rebase in interactive mode}.
 This is particularly convenient for rewriting history: we simply rebase the current HEAD on a commit in the direct history.
 
 Suppose we wanted to alter the commit messages of HEAD\textasciitilde1 and HEAD\textasciitilde2, we would do:
-\marginnote{Reminder: HEAD\textasciitilde n is a shortcut to designate the n+1 th last commit (i.e. n commits behind the latest commit)}
+\marginnote{Reminder: HEAD\textasciitilde n is a shortcut to designate the nth-generation ancestor of HEAD (i.e. n commits behind the latest commit)}
 \begin{lstlisting}[style=BashInputStyle]
   $ git rebase -i HEAD~3
 \end{lstlisting}
@@ -147,7 +152,7 @@ With the -i option, an editor pops up to prompt us if we want to take any action
   pick 87854e9 New message
 \end{lstlisting}
 
-We will ask to edit 2 of the commits by replacing the 'pick' header of the appropriate lines:
+We will ask to edit 2 of the commits by replacing the 'pick' header of the appropriate lines by a new operation, 'edit' (or simply the letter 'e'):
 
 \begin{lstlisting}[style=BashInputStyle]
   edit 21471dd Added 'pow' operation to calc application
@@ -155,8 +160,8 @@ We will ask to edit 2 of the commits by replacing the 'pick' header of the appro
   pick 87854e9 New message
 \end{lstlisting}
 
-When closing the editor, git will take each commit from top to bottom and perform the requested action.
-The first action is to pick and edit 21471dd, so git will stop immediately to allow the user to amend the commit:
+After closing the editor, git will execute the rebase by applying each commit on HEAD\textasciitilde3, and stop when further user inputs are necessary.
+The first action is to edit and apply 21471dd, so git will stop immediately to allow the user to amend the commit:
 
 \begin{lstlisting}[style=BashInputStyle]
 Stopped at 21471dd... Added 'pow' operation to calc application
@@ -196,8 +201,8 @@ The final history after the first amend operation and this rebase and its relati
 \end{figure*}
 
 \noindent We have covered the general mechanism of git rebase in interactive mode. 
-We will now have a small preview of more advances operation which can be done with rebase.
-First, let's undo our changes by reset our local master branch to the state of origin/master:
+We will now have a small preview of more advanced operations which can be done with rebase.
+First, let's undo our changes by resetting our local master branch to the state of origin/master:
 
 \begin{lstlisting}[style=BashInputStyle]
   git reset --hard origin/master
@@ -221,7 +226,7 @@ This time, we modify the rebase editor like the following:
   pick 87854e9 New message
 \end{lstlisting}
 
-When rebasing this, Git first picks 21471dd, then amends it with 511d31d.
+When rebasing this, Git first picks 21471dd as-is, then amends it by combining it with 511d31d's contents.
 An editor opens promoting for the new commit message of the combined commit:
 \marginnote{In fact, the squashing in Git is pretty smart: if you squash more than 2 consecutive commits, they will all appear together in this step.}
 \begin{lstlisting}[style=BashInputStyle]
@@ -314,7 +319,7 @@ Finally, it's possible to delete and reorder commits.
 To do so, simply delete and reorder lines in the interactive rebase editor.
 This is left as exercice.
 
-\bibliography{../common/refs}
-\bibliographystyle{plainnat}
+%\bibliography{../common/refs}
+%\bibliographystyle{plainnat}
 
 \end{document}

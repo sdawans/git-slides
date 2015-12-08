@@ -62,7 +62,7 @@ Il montre quelques possibilités offertes par les fonctionalités de ré-écritu
 
 Avant de découvrir les merveilles de l'édition d'historique de Git, notons que ce privilège doit être utilisé avec sagesse.
 
-Changer l'historique d'une branche \textbf{déjà partagées avec d'autres développeurs} n'est pas une bonne pratique, parce que ces personnes devront exécuter \texttt{git reset --hard} (ou autres commandes selon les cas) pour réintégrer vos changements dans leur historique.
+Changer l'historique d'une branche \textbf{déjà partagées avec d'autres développeurs} n'est pas une bonne pratique, parce que ces personnes devront exécuter \texttt{git reset -{}-hard} (ou autres commandes selon les cas) pour réintégrer vos changements dans leur historique.
 
 \begin{marginfigure}%
   \centering
@@ -70,7 +70,7 @@ Changer l'historique d'une branche \textbf{déjà partagées avec d'autres déve
   \label{fig:spiderman}
 \end{marginfigure}
 
-L'édition d'historique est un moyen pratique de faire le ménage avant de contribuer du code, mais ne doit pas être appliqué a posteriori sur une branch importante (master, develop). \marginnote{en lisant entre les lignes: il est toléré de forcer une ré-écriture sur vos branches personelles, mais mieux vaut ne pas prendre l'habitude.} Git prévoit un garde-fou au cas ou vous outre-passiez cette règle de bonne pratique, volontairement ou non: il faut obligatoirement inclure l'option \texttt{--force} sur la commande \texttt{push} lorsqu'un changement d'historique est appliqué sur une branche déjà précédemment pushée.
+L'édition d'historique est un moyen pratique de faire le ménage avant de contribuer du code, mais ne doit pas être appliqué a posteriori sur une branch importante (master, develop). \marginnote{en lisant entre les lignes: il est toléré de forcer une ré-écriture sur vos branches personelles, mais mieux vaut ne pas prendre l'habitude.} Git prévoit un garde-fou au cas ou vous outre-passiez cette règle de bonne pratique, volontairement ou non: il faut obligatoirement inclure l'option \texttt{-{}-force} sur la commande \texttt{push} lorsqu'un changement d'historique est appliqué sur une branche déjà précédemment pushée.
 
 En cas de doute sur cette règle, retenez simplement \textbf{qu'il faut éviter de modifier l'historique d'une section de branche déjà partagée sur un repo distant}.
 

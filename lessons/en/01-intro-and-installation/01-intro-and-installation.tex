@@ -1,5 +1,5 @@
 % !Mode:: "TeX:UTF-8"
-\documentclass{../../common/tufte-latex/tufte-handout}
+\documentclass[a4paper]{../../common/tufte-latex/tufte-handout}
 
 \title{Git hands-on, part I: Introduction \& Installation}
 \author{S\'ebastien Dawans}
@@ -54,6 +54,8 @@
 
 \maketitle% this prints the handout title, author, and date
 
+\tableofcontents
+
 \begin{abstract}
 \noindent
 This handout introduces the Git Source Code Management Tool and provides installation instructions which should ideally be done by anyone following sessions from UseGit.com \marginnote{\color{blue}\underline{\url{http://www.usegit.com}}} prior to the first lesson.
@@ -95,7 +97,7 @@ Git clients on some linux distributions may be slightly outdated compared to the
 
 \subsection{Installing a Git client on Windows}\label{sec:preparation}
 
-Windows users should install the latest versions of TortoiseGit \marginnote{\url{http://code.google.com/p/tortoisegit/}} (for the TortoisePlink.exe binary) and msysgit \marginnote{\url{http://code.google.com/p/msysgit/}}, in that order.
+Windows users should install the latest versions of TortoiseGit \marginnote{\url{http://code.google.com/p/tortoisegit/}} (for the TortoisePlink.exe binary) and msysgit (now called \textit{Git for Windows}) \marginnote{\url{https://git-for-windows.github.io/}}, in that order.
 Furthermore, windows users will need puttygen.exe and pageant.exe, available on the Putty website \marginnote{\url{http://www.putty.org/}}. These should be stored somewhere on disk, I usually put them in:
 
 \begin{lstlisting}[style=BashInputStyle]
@@ -245,6 +247,8 @@ This is why we say Git is distributed: repositories are completely replicated on
   Resolving deltas: 100% (3/3), done.
 \end{lstlisting}
 
+\newpage
+
 A new folder \texttt{lesson1} should appear in the current directory.
 The Git repository (\texttt{.git folder}) and working tree are both contained inside the \texttt{lesson1} directory.
 \marginnote{\texttt{lesson1}, like all Git repositories, is self-contained and can be moved around the filesystem without risk.}
@@ -290,8 +294,8 @@ This course does not cover internal of Git, but you can find more information on
 
 The next session, \texttt{Part II: Single User Operations}, introduces most of the basic git commands. It is designed to become familiar with Git through practice and without (yet) the complexity of managing multiple users in a workflow. Workflows are described in detail in Part III.
 
-\bibliography{tufte-latex/sample-handout}
-\bibliographystyle{plainnat}
+%\bibliography{tufte-latex/sample-handout}
+%\bibliographystyle{plainnat}
 
 
 

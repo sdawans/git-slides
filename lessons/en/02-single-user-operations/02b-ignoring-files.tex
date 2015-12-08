@@ -1,5 +1,5 @@
 % !Mode:: "TeX:UTF-8"
-\documentclass{../../common/tufte-latex/tufte-handout}
+\documentclass[a4paper]{../../common/tufte-latex/tufte-handout}
 
 \title{Git hands-on, part II-b: Ignoring Files}
 \author{S\'ebastien Dawans}
@@ -64,6 +64,8 @@ This handout is provided as an Annex to \texttt{Part II: Single User Operations}
 In many source code directories, there are files which we do not want to (or should not) version control.
 Any file which is generated from source code and likely to change at every compilation of the project should not be version controlled.
 Likewise, huge files should be handled by other means, even if these are not necessarily regenerated and are a required dependency for a project compilation or runtime like a library.
+\marginnote{Among several initiatives to address the problem of versioning large binary files, the most recent and promising one is Git LFS, \url{https://git-lfs.github.com/}.}
+Typically, these are large binary files or runtime dependencies such as libraries or datasets.
 To handle this, Git can be told to ignore certain files by pattern rules.
 Ignored untracked files will stay untracked without polluting the \textbf{git status} output.
 
@@ -171,7 +173,7 @@ You can obtain a list of all files ignore in this way using:
   $ git ls-files -v | grep ^[a-z]
 \end{lstlisting}
 
-The following 3 aliases are useful to add in your ~/.gitconfig:
+The following 3 aliases are useful to add in your .gitconfig:
 
 \begin{lstlisting}[style=BashInputStyle]
 [alias]
@@ -180,7 +182,7 @@ The following 3 aliases are useful to add in your ~/.gitconfig:
         ignored = !git ls-files -v | grep ^[a-z]
 \end{lstlisting}
 
-\bibliography{../common/refs}
-\bibliographystyle{plainnat}
+%\bibliography{../common/refs}
+%\bibliographystyle{plainnat}
 
 \end{document}
