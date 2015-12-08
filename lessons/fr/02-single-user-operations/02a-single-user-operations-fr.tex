@@ -275,6 +275,8 @@ Créons un nouveau fichier avant d'exécuter \texttt{git status}:
 Git status est plus verbeux, il renseigne qu'il y a un nouveau fichier dans le working tree, non-versionné.
 Tous les fichiers ajoutés au working tree sont \texttt{untracked}, et le resteront tant qu'on ne les ajoute pas explicitement au repository Git.
 
+Pour versionner un fichier, nous utilisons la commande \texttt{git add} dessus.
+
 \begin{marginfigure}%
   \centering
   \includegraphics[width=\linewidth]{gitadd-schema.pdf}
@@ -545,16 +547,20 @@ La contenu supprimé sera considéré comme une modification: son état sera don
 Il est possible d'exécuter \textit{git rm} sur chaque fichier supprimé, même s'il n'est déjà plus présent sur le disque, pour demander à Git d'indexer cette suppression.
 
 Cette opération peut s'avérer fastidieuse s'il y a beaucoup de suppressions.
-Il y a des raccourcis, en commençant par \texttt{git add -u <pathspec>}, qui indexe des modifications et suppressions parmi les fichiers précisés dans l'option <pathspec>. 
-\marginnote{c'est le moment idéal de parcourir la documentation de git add, avec \texttt{git add --help}}
-Si celle-ci n'est pas présente, la commande couvre les fichiers versionnés de tout le working tree. Sans arguments supplémentaires, \texttt{git add -A} a un comportement similaire.
+Vous pouvez choisir d'indexer toutes les suppressions de fichiers avec:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git add -u
-  $ git add -A # equivalent without pathspec
 \end{lstlisting}
 
-Dans le cas de fichiers supprimés, \texttt{git add -u} indexera chaque suppression. Le prochain commit appliquera toutes les suppressions.
+\texttt{git add -u} indexera chaque suppression, mais également toutes les modifications en cours, sans toucher aux fichier non-versionnés.
+Le prochain commit appliquera toutes les suppressions.
+
+Si vous voulez évitez \texttt{git add -u} pour ne pas indexer d'autres modifications présentes dans votre working tree, vous pouvez automatiser de \texttt{git rm} sur chaque fichiers supprimé avec:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git ls-files --deleted -z | xargs -0 git rm
+\end{lstlisting}
 
 \section{Pusher des contributions sur un remote}
 

@@ -1,5 +1,5 @@
 % !Mode:: "TeX:UTF-8"
-\documentclass{../../common/tufte-latex/tufte-handout}
+\documentclass[a4paper]{../../common/tufte-latex/tufte-handout}
 
 \title{Git hands-on, part II: Single User Operations}
 \author{S\'ebastien Dawans}
@@ -51,6 +51,10 @@
 \begin{document}
 
 \maketitle% this prints the handout title, author, and date
+
+\tableofcontents
+
+\newpage
 
 \begin{abstract}
 \noindent
@@ -152,6 +156,7 @@ There is a verbose version of \texttt{git remote} which lists the URLs to each r
 \end{lstlisting}
 
 Without looking at an exhaustive list of remote-related commands, let's just mention that it is possible to add and delete a remote, as well as set a new URL for an existing remote.
+
 For example, we can set an altenate but equivalent notation of the URL:
 
 \marginnote{This is a 1-line command displayed in 2 lines for readability. I use the "\textbackslash" character and an indented second line to represent this.}
@@ -229,7 +234,7 @@ To open Gitk:
 This is by far the fastest and easiest way to get an overview of the local and remote branches.
 In Gitk, the local branches are green, the current local branch is green and bold, and remote branches are prefixed with a peach path.
 Our project also has a yellow label, which is a tag.
-\maginnote{You can't move a tag, but you can delete it and create one elsewhere with the same name. Note that doing so will lead to problems if this tag has already been shared to other Git clients (they won't detect the change without deleting the tag locally)}
+\marginnote{You can't move a tag, but you can delete it and create one elsewhere with the same name. Note that doing so will lead to problems if this tag has already been shared to other Git clients (they won't detect the change without deleting the tag locally)}
 Like a branch, a \texttt{tag} is little more than a label on a certain commit, the main difference being that a tag is designed to be permanent to label an important point in the project history for future reference (code release, development milestone...), whereas a branch is meant to evolve.
 We'll get back to branches and tags later.
 
@@ -273,7 +278,9 @@ Let's create a new file and see the output of git status:
 \end{lstlisting}
 
 Git status is more verbose, it tells us that there's untracked content inside the working tree.
-All files added to a git working tree are untracked, and will stay untracked unless explicitly defined as tracked content in the repository.
+All files copied to a git working tree are untracked, and will stay untracked unless explicitly defined as tracked content in the repository.
+
+To start tracking a file, we use the \texttt{git add} command.
 
 \begin{marginfigure}%
   \centering
@@ -294,7 +301,7 @@ All files added to a git working tree are untracked, and will stay untracked unl
 
 \subsection{Our first commit}
 
-The staging area is unique to Git, and makes it very powerful.
+The Index, also called Staging Area is unique to Git, and makes it very powerful.
 \marginnote{The term commit is also used in SVN, but it is very different here. An SVN commit is non-reversible and applies changes on the remote repository. A Git commit is a local operation and can easily be undone and edited before it reaches a remote server.}
 Successive modifications can be applied until the developer is satisfied with the changes, and is ready to commit them.
 Committing changes will define a new point in the project history with a description, and move the HEAD and current branch to the new commit.
@@ -399,7 +406,7 @@ The file with contain both staged and modified lines:
     §modified:   python/calc.py§
 \end{lstlisting}
 
-Git commit at this point will apply the staged code to the commit, and leave the file in the modified state with the remaning, unstage lines.
+Typing \texttt{git commit} at this point will apply the staged code to the commit, and leave the file in the modified state with the remaning, unstage lines.
 We have already covered commits, so let's stay in this state to explore the \textbf{diff} command.
 
 \marginnote{\texttt{git diff} will display the full diff between the modified content and HEAD. Already staged data does not appear.}
@@ -465,10 +472,8 @@ This \texttt{-a} option doesn't leave time to verify the contents of the commit 
 \subsection{Unstaging stuff}
 
 To unstage work, \texttt{git reset} comes in handy.
-This command is very multi-purpose in Git, for now we will use its default behavior which is to unstage modifications without deleting them.
-\texttt{git reset} without arguments will unstage all currently staged changes, and bring them back to their former state (modified or untracked).
-
-\marginnote{Although it's technically possible to combine \texttt{[tree-ish]} and \texttt{[file]} options to git reset, this will not actually delete the commit if there are other non-reset changes in the commits. Thus the content is reset as desired, but applied this reset requires to stage and commit the modifications in new commits. Git revert has a similar behavior in the sense that we are adding commits to actually undo work.}
+This command is very multi-purpose in Git, for now we will use its default behavior (i.e. using neither the \texttt{-{}-hard} nor \texttt{-{}-soft} options) which is to unstage modifications without deleting them.
+\marginnote{\texttt{git reset} without arguments will unstage all currently staged changes, and bring them back to their former state (modified or untracked).}
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git reset 
@@ -476,7 +481,8 @@ This command is very multi-purpose in Git, for now we will use its default behav
 
 This is only a partial explanation of why git reset does this.
 Like many git commands which accept a \textbf{tree-ish} as optional argument, git reset assumes \texttt{HEAD} when unspecified.
-The general \texttt{git reset} actually undoes commits from the current state up until (and not including) the commit referenced by the tree-ish.
+\marginnote{You can even apply \texttt{git reset} with a destination that is not a direct ancestor of the current branch.}
+The general \texttt{git reset} actually undoes commits from the current state up until (and not including) the commit referenced by the tree-ish. 
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git reset [tree-ish]
@@ -540,21 +546,27 @@ Git will detect the missing content, as a \texttt{git status} will tell you:
 \marginnote{as opposed to a git rm README.md, which stages the deletion.}
 The deleted content is equivalent to a modification: it is not staged by default.
 It is possible to execute \textit{git rm} on each deleted file, even though it's not on disk anymore, which will tell git to stage the deletion.
+
 However, this can be tedious if you've removed lots of files.
-Instead, you can ask git to synchronize the staging area with all modified content with:
+Instead, you can ask git to index all file removals with:
 
 \begin{lstlisting}[style=BashInputStyle]
   $ git add -u
 \end{lstlisting}
 
-In case of deleted files, \texttt{git add -u} will stage every modification at once.
+\texttt{git add -u} not only stages all file removals but also all modifications, leaving untracked files as-is.
 The next commit will apply the file removals.
 
-\pagebreak
+\marginnote{Now that we have seen \texttt{git add -u}, note that the \texttt{git add -A} command introduced earlier is equivalent to typing \texttt{git add . \&\& git add -u}. Read more using \texttt{git add -{}-help}}
+If \texttt{git add -u} is not an option for you, say if you only want to stage file removals but not any of the modified content, you can automate git rm on individual deleted files with:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git ls-files --deleted -z | xargs -0 git rm
+\end{lstlisting}
 
 \section{Pushing work to a remote}
 
-We have progressed locally on the master branch.
+We have progressed locally on the \texttt{master} branch.
 So far, all our modifications are local and we have not shared our work with anyone.
 
 \begin{marginfigure}%
@@ -594,7 +606,7 @@ In other words, it succeeds \textit{if the remote branch is in the direct histor
 
 If pushing is not possible because the remote branch has been updated (usually, by someone else), we enter a multi-user workflow which we will cover later.
 \marginnote{I use integrate here to stay general. There are many ways to do this, like merge, rebase, hard reset...}
-In a few words, the remote modifications must first be \textbf{fetched} locally and "integrated" in our work before we can contribute.
+In a few words, the remote modifications must first be \textbf{fetched} locally and incorporated in our work before we can contribute.
 
 \section{Applying our changes to a feature branch first}
 
@@ -643,8 +655,8 @@ To progress in the \texttt{feature} branch rather then \texttt{master} we must u
 
 \subsection{Integrating a feature branch back into master}
 
-Now, we can start adding commits to the feature branch just like we have done for master.
-Once we are satisfied with our work, we can merge it back into master.
+Now, we can start adding commits to the \texttt{feature} branch just like we have done for \texttt{master}.
+Once we are satisfied with our work, we can integrate the \texttt{feature} branch into \texttt{master}.
 We will not go into too much details for now, but the general idea is:
 
 \begin{marginfigure}%
