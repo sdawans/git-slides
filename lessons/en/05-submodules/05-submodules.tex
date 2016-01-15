@@ -1,0 +1,205 @@
+% !Mode:: "TeX:UTF-8"
+\documentclass[a4paper]{../../common/tufte-latex/tufte-handout}
+
+\title{Git hands-on, part III: Submodules}
+\author{S\'ebastien Dawans}
+
+%\date{07 February 2014} % without \date command, current date is supplied
+
+%\geometry{showframe} % display margins for debugging page layout
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx} % allow embedded images
+  \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+  \graphicspath{{graphics/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{lipsum}   % filler text
+\usepackage{fancyvrb} % extended verbatim environments
+  \fvset{fontsize=\normalsize}% default font size for fancy-verbatim environments
+\usepackage{listings}
+\lstset{showstringspaces=false}
+\usepackage[usenames]{xcolor}
+\usepackage{hyperref}
+
+\lstdefinestyle{BashInputStyle}{
+  language=bash,
+  basicstyle=\footnotesize\ttfamily,
+  %numbers=left,
+  %numberstyle=\tiny,
+  %numbersep=3pt,
+  frame=tb,
+  columns=fullflexible,
+  backgroundcolor=\color{yellow!20},
+  linewidth=0.95\linewidth,
+  xleftmargin=0.05\linewidth,
+  moredelim=**[is][\color{red}]{§}{§},
+  moredelim=**[is][\color{OliveGreen}]{`}{`}
+}
+
+% Standardize command font styles and environments
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+
+\begin{document}
+
+\maketitle% this prints the handout title, author, and date
+
+\tableofcontents
+
+
+\begin{abstract}
+\noindent
+This handout covers the fundamentals of Git submodules.
+
+It is designed for people who are relatively comfortable with the basic Git commands and are looking to manage larger projects consisting of several modules and external dependencies.
+\end{abstract}
+
+\section{Introduction to Submodules}
+
+Git submodules come in handy when you need to combine multiple source code repositories in a single project.
+Technically, a git submodule is a git repository that resides in the working tree of another repository. The submodule is a standalone git repository itself, but takes the form of a submodule when we configure it to appear within the working tree of a particular project.
+
+This can be useful in different scenarios. Suppose you are managing a large project consisting of a backend, a web interface and a mobile application. There could easily be a handful of repositories each handling a specific part of the project. These different git repositories will evolve at their own pace, but can also be part of a greater, single top-level project which references each submodule.
+
+Another common use-case for submodules is when dealing with libraries (3rd party libraries or even your own libraries). Such components are likely to be used in several projects at the same time and thus can have their own remote repository while being referenced in multiple projects.
+
+The real power of submodules comes from the fact that each repository that references a submodule actually references a particular commit of the repository. Projects which use a shared library that continually evolves can thus specify which version of the particular library (of known stability) they would like to reference in their working tree instead of continuously referencing the latest (and not necessarily compatible) version of the given submodule.
+
+\section{Git internals}
+
+There are 2 main parts to the integration of a submodule in a git repository.
+First and most easily observable, each submodule has an entry in a special \texttt{.gitconfig} file that resides besides the \texttt{.git} folder.
+An example of such .gitmodule file is as follows:
+
+\begin{lstlisting}[style=BashInputStyle]
+[submodule "submodule1"]
+        path = submodule1
+        url = https://github.com/sdawans/git-sample-sub1.git
+\end{lstlisting}
+
+This is only part of the information, because the .gitmodules file does not tell git which commit of a particular submodule should be referenced in the top-level project. In other words, Git still has to know which version of the submodule must be checked-out on disk. This information is contained in the tree object that contains the submodule.
+
+\marginnote{Notice how this tree object contains not only blobs and trees but also a commit. This is specific to submodules. It literally means to include here a folder called submodule1 containing the working tree of commit \texttt{84a71c0}}.
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git cat-file -p 1db213668
+  100644 blob e69de29bb2d1d6434b8b29ae775ad8c2e48c5391    .gitignore
+  100644 blob c24840f4259bb7ef1b8fb8c13eb6a9610a6fe23a    .gitmodules
+  040000 tree 543b9bebdc6bd5c4b22136034a95dd097a57d3dd    normal-directory
+  160000 commit 84a71c039b99d2e91dd300aec01a03fa4e9d9059  submodule1
+\end{lstlisting}
+
+We won't need to deal with the internals of tree objects when working with submodules, but it helps to know where this is stored when trying to understand how submodules work.
+
+\section{Cloning a repository with submodules}
+
+The \texttt{-{}-recursive} option of the clone command takes care of cloning all the submodules as well and checking out each submodule to the revision at which it is referenced in the parent project. 
+\marginnote{Note that this is recursive in the sense that submodules may contain other submodules.}
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git clone https://github.com/sdawans/git-samples.git --recursive
+  Cloning into 'git-samples'...
+  ...
+  Submodule 'submodule1' (https://github.com/sdawans/git-sample-sub1.git) registered for path 'submodule1'
+  Submodule 'submodule2' (https://github.com/sdawans/git-sample-sub2.git) registered for path 'submodule2'
+  Cloning into 'submodule1'...
+  ...
+  Submodule path 'submodule1': checked out '84a71c039b99d2e91dd300aec01a03fa4e9d9059'
+  Cloning into 'submodule2'...
+  ...
+  Submodule path 'submodule2': checked out 'ee3372099237b75df170d2d011c4b308d5bc8a32'
+  Submodule 'submodule3' (https://github.com/sdawans/git-sample-sub3.git) registered for path 'submodule3'
+  Cloning into 'submodule3'...
+  ...
+  Submodule path 'submodule2/submodule3': checked out '44bb83815252001ec3c90c2a5b3052389afd83e8'
+\end{lstlisting}
+
+In the above output, we mask the noise from the command output to show exactly what happened when the repository was cloned recursively:
+
+\begin{itemize}
+\item First, the top-level project was cloned.
+\item The direct submodule of the top-level project were then initialized (i.e. registered)
+\item Each submodule was then cloned and checkout out to the appropriate revision. We called this step the \texttt{update} step.
+\item The process is then repeated for each submodule: since submodule2 contains a submodule itself called submodule3, we see that in turn this submodule is initialized and updated.
+\item This is repeated recursively until all submodules are initialized and checked out.
+\end{itemize}
+
+Cloning with the \texttt{-{}-recursive} option is definately the best way to go about cloning a project with submodules, because it avoids unecessary operations to initialize these submodules. It is especially useful when there are embedded submodules, as we will see later when we do it manually.
+
+To see information on submodules from the top-level repository, we can type \texttt{git submodule} without arguments, which will go through each submodule and print its commit hash:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git submodule
+  -84a71c039b99d2e91dd300aec01a03fa4e9d9059 submodule1
+  -ee3372099237b75df170d2d011c4b308d5bc8a32 submodule2
+\end{lstlisting}
+
+To see the above information recursively, we can use the \texttt{foreach} keyword, which is a general command that accepts any subsequent command (Git or otherwise) and applies it at the root level of each submodule. Thus, we can type:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git submodule foreach git submodule
+  Entering 'submodule1'
+  Entering 'submodule2'
+   44bb83815252001ec3c90c2a5b3052389afd83e8 submodule3 (heads/master)
+\end{lstlisting}
+
+\subsection{Forgot the recursive option?}
+
+To clone the above project without the recursive option requires extra steps:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git clone https://github.com/sdawans/git-samples.git
+\end{lstlisting}
+
+If we have a look at the working tree, the submodule1 and submodule2 folders are empty.
+The submodules must be initialized and updated. This can be done in separate or in a single step.
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git submodule init
+  Submodule 'submodule1' (https://github.com/sdawans/git-sample-sub1.git) registered for path 'submodule1'
+  Submodule 'submodule2' (https://github.com/sdawans/git-sample-sub2.git) registered for path 'submodule2'
+\end{lstlisting}
+
+\marginnote{The equivalent command in 1 step is \texttt{git submodule update --init}}
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git submodule update
+  Cloning into 'submodule1'...
+  ...
+  Submodule path 'submodule1': checked out '84a71c039b99d2e91dd300aec01a03fa4e9d9059'
+  Cloning into 'submodule2'...
+  ...
+  Submodule path 'submodule2': checked out 'ee3372099237b75df170d2d011c4b308d5bc8a32'
+\end{lstlisting}
+
+Unfortunately we are not done yet. There was no way to tell Git to clone the submodule3, because the \texttt{git submodule} command does not apply actions recursively. Therefore, we can stay the the top-level repo but use the \texttt{foreach} command:
+
+\begin{lstlisting}[style=BashInputStyle]
+  $ git submodule foreach git submodule update --init
+  Entering 'submodule1'
+  Entering 'submodule2'
+  Submodule 'submodule3' (https://github.com/sdawans/git-sample-sub3.git) registered for path 'submodule3'
+  Cloning into 'submodule3'...
+  ...
+  Submodule path 'submodule3': checked out '44bb83815252001ec3c90c2a5b3052389afd83e8'
+\end{lstlisting}
+
+\section{Working with submodules}
+
+The rest of the submodule commands will be adressed directly in the practical session.
+
+\bibliography{../common/refs}
+\bibliographystyle{plainnat}
+
+\end{document}
+
+
+% \marginnote{}
